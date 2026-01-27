@@ -55,7 +55,11 @@ cp .env.local .env.local.example
 npm run dev
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
+브라우저에서 [http://localhost:3500](http://localhost:3500)을 열어 확인하세요.
+
+### 배포된 사이트
+
+**Vercel**: [https://panorama-korea.vercel.app](https://panorama-korea.vercel.app)
 
 ## 프로젝트 구조
 
