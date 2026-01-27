@@ -1,40 +1,60 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getMockNews, NEWS_FEEDS, type NewsFeedName } from '@/lib/api/news';
+import { NextResponse } from 'next/server';
+import { getMockNews } from '@/lib/api/news';
 import type { NewsItem } from '@/types';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 /**
- * RSS 피드를 서버에서 가져와서 파싱
+ * 네이버 뉴스 검색 API
  */
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const feed = (searchParams.get('feed') || '연합뉴스') as NewsFeedName;
+export async function GET() {
+  const clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
+  const clientSecret = process.env.NEXT_PUBLIC_NAVER_CLIENT_SECRET;
+
+  // API 키가 없으면 목업 데이터 반환
+  if (!clientId || !clientSecret) {
+    console.log('네이버 API 키 없음 - 목업 데이터 사용');
+    return NextResponse.json(
+      { news: getMockNews(), source: 'mock' },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=300',
+        },
+      }
+    );
+  }
 
   try {
-    const rssUrl = NEWS_FEEDS[feed];
+    // 네이버 뉴스 검색 API 호출
+    const query = encodeURIComponent('뉴스');
+    const url = `https://openapi.naver.com/v1/search/news.json?query=${query}&display=10&sort=date`;
 
-    if (!rssUrl) {
-      return NextResponse.json({ error: '잘못된 피드 이름' }, { status: 400 });
-    }
-
-    // RSS XML 가져오기
-    const response = await fetch(rssUrl, {
-      next: { revalidate: 600 }, // 10분 캐시
+    const response = await fetch(url, {
+      headers: {
+        'X-Naver-Client-Id': clientId,
+        'X-Naver-Client-Secret': clientSecret,
+      },
     });
 
     if (!response.ok) {
-      throw new Error(`RSS 피드 오류: ${response.status}`);
+      throw new Error(`네이버 API 오류: ${response.status}`);
     }
 
-    const xmlText = await response.text();
+    const data = await response.json();
 
-    // RSS XML 파싱
-    const news = parseRSSFeed(xmlText, feed);
+    // 네이버 API 응답을 NewsItem 형식으로 변환
+    const news: NewsItem[] = data.items.map((item: any, index: number) => ({
+      id: `${Date.now()}-${index}`,
+      title: item.title.replace(/<\/?b>/g, ''), // HTML 태그 제거
+      summary: item.description.replace(/<\/?b>/g, '').slice(0, 150),
+      url: item.link,
+      source: extractSource(item.title),
+      publishedAt: new Date(item.pubDate),
+    }));
 
     return NextResponse.json(
-      { news, feed },
+      { news, source: 'naver' },
       {
         headers: {
           'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=300',
@@ -42,66 +62,27 @@ export async function GET(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('뉴스 RSS 파싱 오류:', error);
+    console.error('네이버 뉴스 API 오류:', error);
 
     // 에러 시 목업 데이터 반환
     return NextResponse.json(
-      { news: getMockNews(), feed, error: '목업 데이터' },
+      { news: getMockNews(), source: 'mock', error: String(error) },
       { status: 200 }
     );
   }
 }
 
 /**
- * RSS XML을 파싱하여 뉴스 목록 반환
+ * 뉴스 제목에서 언론사 추출 (간단한 휴리스틱)
  */
-function parseRSSFeed(xmlText: string, source: string): NewsItem[] {
-  const news: NewsItem[] = [];
+function extractSource(title: string): string {
+  const sources = ['연합뉴스', 'KBS', 'MBC', 'SBS', 'JTBC', '조선일보', '중앙일보', '동아일보', '한겨레'];
 
-  // 정규표현식으로 item 태그 추출
-  const itemRegex = /<item>([\s\S]*?)<\/item>/g;
-  const items = xmlText.match(itemRegex) || [];
-
-  items.slice(0, 10).forEach((item, index) => {
-    // title 추출
-    const titleMatch = item.match(/<title>([\s\S]*?)<\/title>/);
-    const title = titleMatch
-      ? titleMatch[1].replace(/<!\[CDATA\[|\]\]>/g, '').trim()
-      : '';
-
-    // link 추출
-    const linkMatch = item.match(/<link>([\s\S]*?)<\/link>/);
-    const link = linkMatch ? linkMatch[1].trim() : '#';
-
-    // description 추출
-    const descMatch = item.match(/<description>([\s\S]*?)<\/description>/);
-    let description = descMatch
-      ? descMatch[1].replace(/<!\[CDATA\[|\]\]>/g, '').trim()
-      : '';
-
-    // HTML 태그 제거
-    description = description.replace(/<[^>]*>/g, '').slice(0, 150);
-
-    // pubDate 추출
-    const pubDateMatch = item.match(/<pubDate>([\s\S]*?)<\/pubDate>/);
-    const pubDate = pubDateMatch ? new Date(pubDateMatch[1]) : new Date();
-
-    // 이미지 URL 추출 (enclosure)
-    const enclosureMatch = item.match(/<enclosure[^>]+url="([^"]+)"/);
-    const imageUrl = enclosureMatch ? enclosureMatch[1] : undefined;
-
-    if (title && link) {
-      news.push({
-        id: `${Date.now()}-${index}`,
-        title,
-        summary: description || '내용 없음',
-        url: link,
-        source,
-        publishedAt: pubDate,
-        imageUrl,
-      });
+  for (const source of sources) {
+    if (title.includes(source)) {
+      return source;
     }
-  });
+  }
 
-  return news;
+  return '뉴스';
 }

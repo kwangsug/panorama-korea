@@ -18,7 +18,7 @@ export function NewsWidget() {
   async function loadNews() {
     try {
       setLoading(true);
-      const newsData = await getNews('연합뉴스');
+      const newsData = await getNews();
       setNews(newsData);
     } catch (error) {
       console.error('뉴스 로딩 실패:', error);

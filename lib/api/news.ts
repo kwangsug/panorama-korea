@@ -1,73 +1,18 @@
 /**
- * 뉴스 RSS 피드 클라이언트
+ * 네이버 뉴스 검색 API 클라이언트
  *
- * 주요 언론사 RSS 피드를 파싱하여 뉴스 목록을 제공합니다.
+ * API 키 발급: https://developers.naver.com/apps
  */
 
 import { NewsItem } from '@/types';
 
-// 주요 언론사 RSS 피드 URL
-export const NEWS_FEEDS = {
-  연합뉴스: 'https://www.yna.co.kr/rss/news.xml',
-  KBS: 'https://fs.kbs.co.kr/rss/allnews.xml',
-  SBS: 'https://news.sbs.co.kr/news/SectionRssFeed.do?sectionId=01',
-  // 네이버 뉴스는 CORS 이슈가 있어 서버 사이드에서 파싱 필요
-} as const;
-
-export type NewsFeedName = keyof typeof NEWS_FEEDS;
-
 /**
- * RSS XML을 파싱하여 뉴스 목록 반환
+ * 네이버 뉴스 검색 API로 뉴스 가져오기
  */
-async function parseRSSFeed(xmlText: string): Promise<NewsItem[]> {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(xmlText, 'text/xml');
-
-  const items = doc.querySelectorAll('item');
-  const news: NewsItem[] = [];
-
-  items.forEach((item, index) => {
-    const title = item.querySelector('title')?.textContent || '';
-    const link = item.querySelector('link')?.textContent || '';
-    const description = item.querySelector('description')?.textContent || '';
-    const pubDate = item.querySelector('pubDate')?.textContent || '';
-
-    // 이미지 URL 추출 (일부 RSS는 enclosure 또는 description 내 img 태그에 포함)
-    let imageUrl = item.querySelector('enclosure')?.getAttribute('url') || undefined;
-
-    if (!imageUrl && description.includes('<img')) {
-      const imgMatch = description.match(/<img[^>]+src="([^">]+)"/);
-      if (imgMatch) {
-        imageUrl = imgMatch[1];
-      }
-    }
-
-    news.push({
-      id: `${Date.now()}-${index}`,
-      title: title.replace(/<!\[CDATA\[|\]\]>/g, '').trim(),
-      summary: description
-        .replace(/<!\[CDATA\[|\]\]>/g, '')
-        .replace(/<[^>]*>/g, '')
-        .trim()
-        .slice(0, 150),
-      url: link,
-      source: '연합뉴스', // RSS 피드 소스에 따라 변경
-      publishedAt: pubDate ? new Date(pubDate) : new Date(),
-      imageUrl,
-    });
-  });
-
-  return news.slice(0, 10); // 최대 10개
-}
-
-/**
- * 뉴스 목록 조회
- * 브라우저에서는 CORS 이슈로 직접 호출 불가, API Route 사용 권장
- */
-export async function getNews(feed: NewsFeedName = '연합뉴스'): Promise<NewsItem[]> {
+export async function getNews(): Promise<NewsItem[]> {
   try {
     // Next.js API Route를 통해 뉴스 가져오기
-    const response = await fetch(`/api/news?feed=${feed}`, {
+    const response = await fetch('/api/news', {
       next: { revalidate: 600 }, // 10분마다 캐시 갱신
     });
 
@@ -76,7 +21,7 @@ export async function getNews(feed: NewsFeedName = '연합뉴스'): Promise<News
     }
 
     const data = await response.json();
-    return data.news;
+    return data.news || [];
   } catch (error) {
     console.error('뉴스 로딩 실패:', error);
     // 에러 시 목업 데이터 반환
