@@ -8,7 +8,10 @@ export const dynamic = 'force-dynamic';
 /**
  * 네이버 뉴스 검색 API
  */
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const source = searchParams.get('source') || 'naver'; // 기본값: naver
+
   const clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
   const clientSecret = process.env.NEXT_PUBLIC_NAVER_CLIENT_SECRET;
 
@@ -26,9 +29,15 @@ export async function GET() {
   }
 
   try {
+    // 소스별 검색 쿼리 설정
+    let query = '주요 뉴스'; // 기본값
+    if (source === 'yonhap') {
+      query = '연합뉴스';
+    }
+
     // 네이버 뉴스 검색 API 호출
-    const query = encodeURIComponent('뉴스');
-    const url = `https://openapi.naver.com/v1/search/news.json?query=${query}&display=10&sort=date`;
+    const encodedQuery = encodeURIComponent(query);
+    const url = `https://openapi.naver.com/v1/search/news.json?query=${encodedQuery}&display=20&sort=date`;
 
     const response = await fetch(url, {
       headers: {

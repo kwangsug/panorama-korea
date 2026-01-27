@@ -34,37 +34,37 @@ export function WeatherWidget() {
 
   if (loading || !weather) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+      <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 border border-white/20">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+          <div className="w-12 h-12 bg-blue-500/30 rounded-full flex items-center justify-center backdrop-blur-sm">
             <span className="text-2xl">☀️</span>
           </div>
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">날씨</h2>
+          <h2 className="text-2xl font-semibold text-white">날씨</h2>
         </div>
         <div className="animate-pulse space-y-3">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+          <div className="h-4 bg-white/20 rounded w-3/4"></div>
+          <div className="h-4 bg-white/20 rounded w-1/2"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+    <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 hover:bg-white/15 transition-all border border-white/20">
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+          <div className="w-12 h-12 bg-blue-500/30 rounded-full flex items-center justify-center backdrop-blur-sm">
             <span className="text-2xl">☀️</span>
           </div>
           <div>
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">날씨</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{weather.location}</p>
+            <h2 className="text-2xl font-semibold text-white">날씨</h2>
+            <p className="text-sm text-gray-300">{weather.location}</p>
           </div>
         </div>
         <button
           onClick={loadWeatherData}
-          className="p-2 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
+          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
           title="새로고침"
         >
           <span className="text-xl">🔄</span>
@@ -75,10 +75,10 @@ export function WeatherWidget() {
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-6xl font-bold text-gray-800 dark:text-white">
+            <div className="text-6xl font-bold text-white">
               {weather.temperature}°
             </div>
-            <div className="text-xl text-gray-600 dark:text-gray-300 mt-2">
+            <div className="text-xl text-gray-200 mt-2">
               {weather.condition}
             </div>
           </div>
@@ -91,15 +91,15 @@ export function WeatherWidget() {
 
         {/* 세부 정보 */}
         <div className="grid grid-cols-2 gap-4 mt-4">
-          <div className="bg-white/50 dark:bg-gray-700/50 rounded-lg p-3">
-            <div className="text-sm text-gray-600 dark:text-gray-400">습도</div>
-            <div className="text-lg font-semibold text-gray-800 dark:text-white">
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="text-sm text-gray-300">습도</div>
+            <div className="text-lg font-semibold text-white">
               {weather.humidity}%
             </div>
           </div>
-          <div className="bg-white/50 dark:bg-gray-700/50 rounded-lg p-3">
-            <div className="text-sm text-gray-600 dark:text-gray-400">풍속</div>
-            <div className="text-lg font-semibold text-gray-800 dark:text-white">
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="text-sm text-gray-300">풍속</div>
+            <div className="text-lg font-semibold text-white">
               {weather.windSpeed} m/s
             </div>
           </div>
@@ -108,7 +108,7 @@ export function WeatherWidget() {
 
       {/* 주간 예보 */}
       <div>
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+        <h3 className="text-sm font-semibold text-gray-200 mb-3">
           주간 예보
         </h3>
         <div className="space-y-2">
@@ -119,10 +119,10 @@ export function WeatherWidget() {
             return (
               <div
                 key={day.date}
-                className="flex items-center justify-between bg-white/50 dark:bg-gray-700/50 rounded-lg p-3"
+                className="flex items-center justify-between bg-white/10 rounded-lg p-3"
               >
                 <div className="flex items-center gap-3 flex-1">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-8">
+                  <span className="text-sm font-medium text-gray-200 w-8">
                     {dayName}
                   </span>
                   <img
@@ -130,15 +130,15 @@ export function WeatherWidget() {
                     alt={day.condition}
                     className="w-8 h-8"
                   />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-sm text-gray-300">
                     {day.condition}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                  <span className="text-sm font-semibold text-blue-300">
                     {day.maxTemp}°
                   </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-500">
+                  <span className="text-sm text-gray-400">
                     {day.minTemp}°
                   </span>
                 </div>
@@ -149,7 +149,7 @@ export function WeatherWidget() {
       </div>
 
       {/* 업데이트 시간 */}
-      <div className="mt-4 text-xs text-gray-500 dark:text-gray-400 text-center">
+      <div className="mt-4 text-xs text-gray-400 text-center">
         마지막 업데이트: {weather.updatedAt.toLocaleTimeString('ko-KR')}
       </div>
     </div>

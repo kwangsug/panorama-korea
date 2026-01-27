@@ -9,10 +9,10 @@ import { NewsItem } from '@/types';
 /**
  * 네이버 뉴스 검색 API로 뉴스 가져오기
  */
-export async function getNews(): Promise<NewsItem[]> {
+export async function getNews(source: 'naver' | 'yonhap' = 'naver'): Promise<NewsItem[]> {
   try {
     // Next.js API Route를 통해 뉴스 가져오기
-    const response = await fetch('/api/news', {
+    const response = await fetch(`/api/news?source=${source}`, {
       next: { revalidate: 600 }, // 10분마다 캐시 갱신
     });
 

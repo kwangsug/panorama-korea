@@ -1,85 +1,105 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { WeatherWidget } from '@/components/widgets/WeatherWidget';
 import { NewsWidget } from '@/components/widgets/NewsWidget';
 
 export default function Home() {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <main className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <header className="mb-12 text-center">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Panorama Korea
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
-            한국형 스마트 디스플레이 - 날씨, 캘린더, 뉴스, 교통정보를 한눈에
-          </p>
-        </header>
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-        {/* Widget Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      {/* Top Bar */}
+      <header className="flex items-center justify-between px-8 py-4 bg-black/20 backdrop-blur-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+            <span className="text-2xl">🌐</span>
+          </div>
+          <h1 className="text-2xl font-bold text-white">Panorama Korea</h1>
+        </div>
+        <Link
+          href="/settings"
+          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          title="설정"
+        >
+          <span className="text-2xl">⚙️</span>
+        </Link>
+      </header>
+
+      {/* Main Content */}
+      <main className="px-8 py-6">
+        {/* Current Time & Date */}
+        <div className="text-center mb-8">
+          <div className="text-7xl font-light text-white mb-2">
+            {currentTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+          </div>
+          <div className="text-2xl text-gray-300">
+            {currentTime.toLocaleDateString('ko-KR', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              weekday: 'long'
+            })}
+          </div>
+        </div>
+
+        {/* Widget Grid - 3 columns on large screens */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-[1800px] mx-auto">
           {/* Weather Widget */}
           <WeatherWidget />
 
           {/* Calendar Widget */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 hover:bg-white/15 transition-all border border-white/20">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-purple-500/30 rounded-full flex items-center justify-center backdrop-blur-sm">
                 <span className="text-2xl">📅</span>
               </div>
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">캘린더</h2>
+              <h2 className="text-2xl font-semibold text-white">캘린더</h2>
             </div>
-            <p className="text-gray-600 dark:text-gray-300">
-              공휴일, 음력 날짜, 개인 일정 관리
-            </p>
-            <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-              한국 공휴일 API 연동 예정
+            <div className="space-y-3">
+              <div className="text-gray-200">
+                <p className="text-sm text-gray-400 mb-2">오늘의 일정</p>
+                <div className="space-y-2">
+                  <div className="bg-white/10 rounded-lg p-3">
+                    <p className="text-sm font-medium">공휴일 및 일정 표시 예정</p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 text-sm text-gray-400">
+                한국 공휴일 API 연동 예정
+              </div>
             </div>
           </div>
 
           {/* News Widget */}
           <NewsWidget />
-
-          {/* Traffic Widget */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center">
-                <span className="text-2xl">🚇</span>
-              </div>
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">교통</h2>
-            </div>
-            <p className="text-gray-600 dark:text-gray-300">
-              실시간 대중교통 및 교통 상황
-            </p>
-            <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-              서울 교통정보 API 연동 예정
-            </div>
-          </div>
         </div>
-
-        {/* Status Banner */}
-        <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl p-6 text-white text-center">
-          <p className="text-lg font-semibold mb-2">✅ 날씨 & 뉴스 위젯 구현 완료!</p>
-          <p className="text-sm opacity-90">
-            실시간 날씨와 주요 뉴스 헤드라인을 확인하세요
-          </p>
-        </div>
-
-        {/* Footer */}
-        <footer className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>
-            원본:{" "}
-            <a
-              href="https://panorama-2ps.pages.dev/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              Panorama (일본판)
-            </a>
-          </p>
-          <p className="mt-2">Made with ❤️ using Next.js & Tailwind CSS</p>
-        </footer>
       </main>
+
+      {/* Footer */}
+      <footer className="fixed bottom-0 left-0 right-0 py-3 px-8 text-center text-sm text-gray-400 bg-black/20 backdrop-blur-sm">
+        <p>
+          Based on{" "}
+          <a
+            href="https://panorama-2ps.pages.dev/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:underline"
+          >
+            Panorama
+          </a>
+          {" "}• Made with Next.js & Tailwind CSS
+        </p>
+      </footer>
     </div>
   );
 }
