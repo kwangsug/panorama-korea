@@ -1,0 +1,34 @@
+{
+  "project": {
+    "name": "panorama-korea",
+    "level": "Dynamic",
+    "description": "한국형 스마트 디스플레이 웹 애플리케이션 - 날씨, 캘린더, 뉴스, 교통정보 통합",
+    "created": "2026-01-27",
+    "version": "1.0.0"
+  },
+  "tech_stack": {
+    "frontend": "Next.js 14+ App Router",
+    "backend": "bkend.ai BaaS",
+    "styling": "Tailwind CSS",
+    "state": "Zustand",
+    "data_fetching": "TanStack Query",
+    "language": "TypeScript"
+  },
+  "features": {
+    "weather": "한국 기상청 API 연동",
+    "calendar": "공휴일, 음력, 개인 일정",
+    "news": "한국 뉴스 피드",
+    "traffic": "실시간 교통정보"
+  },
+  "pdca": {
+    "current_phase": "init",
+    "plan": null,
+    "design": null,
+    "analysis": null,
+    "report": null
+  },
+  "reference": {
+    "original": "https://panorama-2ps.pages.dev/",
+    "approach": "한국화 및 기능 확장"
+  }
+}
