@@ -1,3 +1,5 @@
+import { WeatherWidget } from '@/components/widgets/WeatherWidget';
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -15,20 +17,7 @@ export default function Home() {
         {/* Widget Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Weather Widget */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                <span className="text-2xl">☀️</span>
-              </div>
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">날씨</h2>
-            </div>
-            <p className="text-gray-600 dark:text-gray-300">
-              실시간 날씨 정보와 주간 예보를 확인하세요
-            </p>
-            <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-              기상청 API 연동 예정
-            </div>
-          </div>
+          <WeatherWidget />
 
           {/* Calendar Widget */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
@@ -81,9 +70,9 @@ export default function Home() {
 
         {/* Status Banner */}
         <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl p-6 text-white text-center">
-          <p className="text-lg font-semibold mb-2">🚀 개발 진행중</p>
+          <p className="text-lg font-semibold mb-2">✅ 날씨 위젯 구현 완료!</p>
           <p className="text-sm opacity-90">
-            각 위젯의 실시간 데이터 연동을 준비하고 있습니다
+            OpenWeatherMap API로 실시간 날씨 데이터를 제공합니다
           </p>
         </div>
 
