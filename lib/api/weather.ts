@@ -1,8 +1,14 @@
 /**
- * OpenWeatherMap API 2.5 클라이언트
+ * OpenWeatherMap One Call API 3.0 클라이언트
  *
  * API 키 발급: https://openweathermap.org/api
- * 무료 가입 후 즉시 사용 가능
+ * One Call API 3.0 구독 필요
+ * 무료 플랜: 1,000 calls/day
+ *
+ * 하나의 API로 제공:
+ * - 현재 날씨
+ * - 시간별 예보 (48시간)
+ * - 일별 예보 (8일)
  */
 
 export interface WeatherData {
@@ -24,31 +30,19 @@ export interface WeatherForecast {
   precipitation: number;
 }
 
-// 주요 도시 이름 (OpenWeatherMap에서 사용)
-export const MAJOR_CITIES = [
-  'Seoul',
-  'Busan',
-  'Incheon',
-  'Daegu',
-  'Daejeon',
-  'Gwangju',
-  'Ulsan',
-  'Sejong',
-] as const;
+// 주요 도시 좌표 (위도, 경도)
+export const MAJOR_CITIES = {
+  Seoul: { lat: 37.5665, lon: 126.9780, nameKr: '서울' },
+  Busan: { lat: 35.1796, lon: 129.0756, nameKr: '부산' },
+  Incheon: { lat: 37.4563, lon: 126.7052, nameKr: '인천' },
+  Daegu: { lat: 35.8714, lon: 128.6014, nameKr: '대구' },
+  Daejeon: { lat: 36.3504, lon: 127.3845, nameKr: '대전' },
+  Gwangju: { lat: 35.1595, lon: 126.8526, nameKr: '광주' },
+  Ulsan: { lat: 35.5384, lon: 129.3114, nameKr: '울산' },
+  Sejong: { lat: 36.4800, lon: 127.2890, nameKr: '세종' },
+} as const;
 
-export type CityName = (typeof MAJOR_CITIES)[number];
-
-// 한글 도시명 매핑
-const CITY_NAME_KR: Record<CityName, string> = {
-  Seoul: '서울',
-  Busan: '부산',
-  Incheon: '인천',
-  Daegu: '대구',
-  Daejeon: '대전',
-  Gwangju: '광주',
-  Ulsan: '울산',
-  Sejong: '세종',
-};
+export type CityName = keyof typeof MAJOR_CITIES;
 
 // 날씨 상태 한글 매핑
 const WEATHER_CONDITION_KR: Record<string, string> = {
@@ -70,26 +64,21 @@ const WEATHER_CONDITION_KR: Record<string, string> = {
 };
 
 /**
- * 현재 날씨 조회 (Weather API 2.5)
+ * One Call API 3.0으로 현재 날씨 조회
  */
 export async function getCurrentWeather(city: CityName = 'Seoul'): Promise<WeatherData> {
   const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 
   // API 키가 없으면 목업 데이터 반환
   if (!apiKey) {
-    return {
-      temperature: 15,
-      condition: '맑음',
-      conditionIcon: '01d',
-      humidity: 60,
-      windSpeed: 2.5,
-      location: CITY_NAME_KR[city],
-      updatedAt: new Date(),
-    };
+    return getMockWeather(city);
   }
 
   try {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},KR&appid=${apiKey}&units=metric&lang=kr`;
+    const { lat, lon, nameKr } = MAJOR_CITIES[city];
+
+    // One Call API 3.0 엔드포인트
+    const url = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=kr&exclude=minutely,hourly,alerts`;
 
     const response = await fetch(url, {
       next: { revalidate: 600 }, // 10분마다 캐시 갱신
@@ -101,33 +90,26 @@ export async function getCurrentWeather(city: CityName = 'Seoul'): Promise<Weath
 
     const data = await response.json();
 
+    // current 데이터에서 정보 추출
+    const current = data.current;
+
     return {
-      temperature: Math.round(data.main.temp),
-      condition: WEATHER_CONDITION_KR[data.weather[0].main] || data.weather[0].description,
-      conditionIcon: data.weather[0].icon,
-      humidity: data.main.humidity,
-      windSpeed: data.wind.speed,
-      location: CITY_NAME_KR[city],
+      temperature: Math.round(current.temp),
+      condition: WEATHER_CONDITION_KR[current.weather[0].main] || current.weather[0].description,
+      conditionIcon: current.weather[0].icon,
+      humidity: current.humidity,
+      windSpeed: current.wind_speed,
+      location: nameKr,
       updatedAt: new Date(),
     };
   } catch (error) {
-    console.error('OpenWeatherMap API 오류:', error);
-
-    // 에러 시 목업 데이터 반환
-    return {
-      temperature: 15,
-      condition: '맑음',
-      conditionIcon: '01d',
-      humidity: 60,
-      windSpeed: 2.5,
-      location: CITY_NAME_KR[city],
-      updatedAt: new Date(),
-    };
+    console.error('OpenWeatherMap One Call API 오류:', error);
+    return getMockWeather(city);
   }
 }
 
 /**
- * 5일 예보 조회 (Forecast API 2.5)
+ * One Call API 3.0으로 일별 예보 조회
  */
 export async function getWeatherForecast(city: CityName = 'Seoul'): Promise<WeatherForecast[]> {
   const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
@@ -138,7 +120,10 @@ export async function getWeatherForecast(city: CityName = 'Seoul'): Promise<Weat
   }
 
   try {
-    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city},KR&appid=${apiKey}&units=metric&lang=kr`;
+    const { lat, lon } = MAJOR_CITIES[city];
+
+    // One Call API 3.0 엔드포인트
+    const url = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=kr&exclude=minutely,hourly,current,alerts`;
 
     const response = await fetch(url, {
       next: { revalidate: 3600 }, // 1시간마다 캐시 갱신
@@ -150,53 +135,40 @@ export async function getWeatherForecast(city: CityName = 'Seoul'): Promise<Weat
 
     const data = await response.json();
 
-    // 일별 데이터로 그룹화
-    const dailyData: Record<string, any[]> = {};
+    // daily 데이터에서 예보 추출 (첫 5일)
+    const forecasts: WeatherForecast[] = data.daily.slice(0, 5).map((day: any) => {
+      const date = new Date(day.dt * 1000); // Unix timestamp to Date
 
-    data.list.forEach((item: any) => {
-      const date = item.dt_txt.split(' ')[0];
-      if (!dailyData[date]) {
-        dailyData[date] = [];
-      }
-      dailyData[date].push(item);
+      return {
+        date: date.toISOString().slice(0, 10),
+        maxTemp: Math.round(day.temp.max),
+        minTemp: Math.round(day.temp.min),
+        condition: WEATHER_CONDITION_KR[day.weather[0].main] || day.weather[0].description,
+        conditionIcon: day.weather[0].icon,
+        precipitation: Math.round((day.pop || 0) * 100), // 강수 확률 (%)
+      };
     });
-
-    // 각 날짜별 최고/최저 온도 계산
-    const forecasts: WeatherForecast[] = Object.entries(dailyData)
-      .slice(0, 5)
-      .map(([date, items]) => {
-        const temps = items.map((item) => item.main.temp);
-        const maxTemp = Math.round(Math.max(...temps));
-        const minTemp = Math.round(Math.min(...temps));
-
-        // 가장 빈번한 날씨 상태 선택
-        const weatherCounts: Record<string, number> = {};
-        items.forEach((item) => {
-          const weather = item.weather[0].main;
-          weatherCounts[weather] = (weatherCounts[weather] || 0) + 1;
-        });
-        const mostCommonWeather = Object.entries(weatherCounts).sort((a, b) => b[1] - a[1])[0][0];
-        const weatherIcon = items.find((item) => item.weather[0].main === mostCommonWeather)
-          ?.weather[0].icon;
-
-        // 강수량 계산
-        const precipitation = items.reduce((sum, item) => sum + (item.rain?.['3h'] || 0), 0);
-
-        return {
-          date,
-          maxTemp,
-          minTemp,
-          condition: WEATHER_CONDITION_KR[mostCommonWeather] || mostCommonWeather,
-          conditionIcon: weatherIcon || '01d',
-          precipitation: Math.round(precipitation),
-        };
-      });
 
     return forecasts;
   } catch (error) {
-    console.error('OpenWeatherMap Forecast API 오류:', error);
+    console.error('OpenWeatherMap One Call Forecast API 오류:', error);
     return generateMockForecast();
   }
+}
+
+/**
+ * 목업 날씨 데이터 생성
+ */
+function getMockWeather(city: CityName): WeatherData {
+  return {
+    temperature: 15,
+    condition: '맑음',
+    conditionIcon: '01d',
+    humidity: 60,
+    windSpeed: 2.5,
+    location: MAJOR_CITIES[city].nameKr,
+    updatedAt: new Date(),
+  };
 }
 
 /**
