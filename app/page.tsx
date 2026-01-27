@@ -1,4 +1,5 @@
 import { WeatherWidget } from '@/components/widgets/WeatherWidget';
+import { NewsWidget } from '@/components/widgets/NewsWidget';
 
 export default function Home() {
   return (
@@ -36,20 +37,7 @@ export default function Home() {
           </div>
 
           {/* News Widget */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                <span className="text-2xl">📰</span>
-              </div>
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">뉴스</h2>
-            </div>
-            <p className="text-gray-600 dark:text-gray-300">
-              주요 뉴스 헤드라인을 실시간으로
-            </p>
-            <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-              뉴스 API 연동 예정
-            </div>
-          </div>
+          <NewsWidget />
 
           {/* Traffic Widget */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
@@ -70,9 +58,9 @@ export default function Home() {
 
         {/* Status Banner */}
         <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl p-6 text-white text-center">
-          <p className="text-lg font-semibold mb-2">✅ 날씨 위젯 구현 완료!</p>
+          <p className="text-lg font-semibold mb-2">✅ 날씨 & 뉴스 위젯 구현 완료!</p>
           <p className="text-sm opacity-90">
-            OpenWeatherMap API로 실시간 날씨 데이터를 제공합니다
+            실시간 날씨와 주요 뉴스 헤드라인을 확인하세요
           </p>
         </div>
 
