@@ -28,11 +28,11 @@ function FlipCard({ value }: FlipCardProps) {
     }
   }, [value, previousValue]);
 
-  const textClass = "text-5xl md:text-6xl lg:text-7xl text-white tabular-nums font-bold";
+  const textClass = "text-6xl md:text-7xl lg:text-8xl text-white tabular-nums font-bold";
   const fontStyle = { fontFamily: 'var(--font-bebas), system-ui' };
 
   return (
-    <div className="relative w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28" style={{ perspective: '300px' }}>
+    <div className="relative flex-1 h-24 md:h-28 lg:h-32" style={{ perspective: '300px' }}>
       {/* 하단 고정 패널 (이전 값 -> 애니메이션 후 현재 값) */}
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-slate-800 to-slate-900 rounded-b-lg border-x border-b border-white/20 overflow-hidden">
         <div className="absolute inset-0 flex items-start justify-center">
@@ -100,8 +100,8 @@ function FlipCard({ value }: FlipCardProps) {
 
 function Separator() {
   return (
-    <div className="flex items-center justify-center h-20 md:h-24 lg:h-28 px-1">
-      <span className="text-3xl md:text-4xl lg:text-5xl font-bold text-white/50">:</span>
+    <div className="flex items-center justify-center h-24 md:h-28 lg:h-32 px-2">
+      <span className="text-4xl md:text-5xl lg:text-6xl font-bold text-white/50">:</span>
     </div>
   );
 }
@@ -310,15 +310,15 @@ export function ClockWidget() {
   if (!mounted) {
     return (
       <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-4 md:p-6 border border-white/10 flex flex-col justify-start">
-        <div className="flex items-center justify-center gap-1 md:gap-2 mb-4 md:mb-6">
-          <div className="w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28 bg-slate-700/50 rounded-lg animate-pulse" />
-          <div className="w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28 bg-slate-700/50 rounded-lg animate-pulse" />
-          <div className="h-20 md:h-24 lg:h-28 px-1" />
-          <div className="w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28 bg-slate-700/50 rounded-lg animate-pulse" />
-          <div className="w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28 bg-slate-700/50 rounded-lg animate-pulse" />
-          <div className="h-20 md:h-24 lg:h-28 px-1" />
-          <div className="w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28 bg-slate-700/50 rounded-lg animate-pulse" />
-          <div className="w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28 bg-slate-700/50 rounded-lg animate-pulse" />
+        <div className="flex items-center justify-between gap-1 md:gap-2 mb-4 md:mb-6 w-full">
+          <div className="flex-1 h-24 md:h-28 lg:h-32 bg-slate-700/50 rounded-lg animate-pulse" />
+          <div className="flex-1 h-24 md:h-28 lg:h-32 bg-slate-700/50 rounded-lg animate-pulse" />
+          <div className="h-24 md:h-28 lg:h-32 px-2" />
+          <div className="flex-1 h-24 md:h-28 lg:h-32 bg-slate-700/50 rounded-lg animate-pulse" />
+          <div className="flex-1 h-24 md:h-28 lg:h-32 bg-slate-700/50 rounded-lg animate-pulse" />
+          <div className="h-24 md:h-28 lg:h-32 px-2" />
+          <div className="flex-1 h-24 md:h-28 lg:h-32 bg-slate-700/50 rounded-lg animate-pulse" />
+          <div className="flex-1 h-24 md:h-28 lg:h-32 bg-slate-700/50 rounded-lg animate-pulse" />
         </div>
       </div>
     );
@@ -326,8 +326,8 @@ export function ClockWidget() {
 
   return (
     <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-4 md:p-6 border border-white/10 flex flex-col justify-start">
-      {/* 시계 - 플립 카드 */}
-      <div className="flex items-center justify-center gap-1 md:gap-2 mb-4 md:mb-6">
+      {/* 시계 - 플립 카드 (전체 너비 활용) */}
+      <div className="flex items-center justify-between gap-1 md:gap-2 mb-4 md:mb-6 w-full">
         <FlipCard value={hours[0]} />
         <FlipCard value={hours[1]} />
         <Separator />
