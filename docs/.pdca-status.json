@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-01-28T08:00:47.409Z",
+  "lastUpdated": "2026-01-28T08:19:52.228Z",
   "activeFeatures": [
     "panorama-korea",
     "widgets",
@@ -10,7 +10,7 @@
     "calendar",
     "finance"
   ],
-  "primaryFeature": "widgets",
+  "primaryFeature": "panorama-korea",
   "features": {
     "panorama-korea": {
       "phase": "do",
@@ -21,7 +21,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-01-28T00:44:12.264Z",
-        "lastUpdated": "2026-01-28T06:29:13.904Z"
+        "lastUpdated": "2026-01-28T08:19:43.546Z"
       }
     },
     "widgets": {
@@ -105,21 +105,9 @@
   "session": {
     "startedAt": "2026-01-28T00:37:09.466Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-01-28T08:00:47.409Z"
+    "lastActivity": "2026-01-28T08:19:52.228Z"
   },
   "history": [
-    {
-      "timestamp": "2026-01-28T05:16:38.311Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T05:17:19.312Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
     {
       "timestamp": "2026-01-28T05:17:46.513Z",
       "feature": "widgets",
@@ -705,6 +693,18 @@
     {
       "timestamp": "2026-01-28T08:00:10.199Z",
       "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T08:18:22.279Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T08:19:43.546Z",
+      "feature": "panorama-korea",
       "phase": "do",
       "action": "updated"
     }

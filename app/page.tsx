@@ -223,15 +223,15 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden flex items-center justify-center">
       {/* Dashboard Container - 32:9 Aspect Ratio (1920x540) */}
-      <div className="w-full max-w-[1920px] aspect-[32/9] p-4 md:p-6 flex gap-4 md:gap-5">
-        {/* Clock Widget - 왼쪽 (4 비율) */}
-        <div className="w-[40%] flex-shrink-0 h-full">
+      <div className="w-full max-w-[1920px] aspect-[32/9] p-4 md:p-6 mx-auto flex gap-4 md:gap-5">
+        {/* Clock Widget - 왼쪽 (45% - 황금비 근사) */}
+        <div className="w-[45%] flex-shrink-0 h-full">
           <ClockWidget />
         </div>
 
-        {/* Content Area - 오른쪽 (6 비율) */}
+        {/* Content Area - 오른쪽 (55% - 황금비 근사) */}
         <div
-          className="w-[60%] flex-shrink-0 h-full relative overflow-hidden"
+          className="w-[55%] flex-shrink-0 h-full relative overflow-hidden"
           style={{ perspective: '1200px' }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
