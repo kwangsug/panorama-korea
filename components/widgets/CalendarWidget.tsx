@@ -242,38 +242,6 @@ export function CalendarWidget({
               {currentEvent.description}
             </p>
           )}
-
-          {/* Next Event */}
-          {nextEvent && (
-            <div className="mt-4 pt-4 border-t border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[1vw] md:text-[0.8vw] text-gray-400">다음 예정</span>
-                <span className="text-[1vw] md:text-[0.8vw] text-gray-500">
-                  {nextEvent.start.toLocaleDateString('ko-KR', {
-                    month: 'long',
-                    day: 'numeric',
-                    weekday: 'short'
-                  })}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                {nextEvent.color && (
-                  <div
-                    className="w-1 h-6 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: nextEvent.color }}
-                  />
-                )}
-                <p className="text-[1.2vw] md:text-[1vw] text-gray-300 font-semibold line-clamp-1 flex-1">
-                  {nextEvent.title}
-                </p>
-              </div>
-              {nextEvent.sourceName && (
-                <p className="text-[0.8vw] md:text-[0.6vw] text-gray-500 mt-1 ml-3">
-                  {nextEvent.sourceName}
-                </p>
-              )}
-            </div>
-          )}
         </div>
       </div>
 
