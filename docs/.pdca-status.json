@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-01-28T06:57:24.414Z",
+  "lastUpdated": "2026-01-28T08:00:47.409Z",
   "activeFeatures": [
     "panorama-korea",
     "widgets",
@@ -33,7 +33,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-01-28T00:46:45.282Z",
-        "lastUpdated": "2026-01-28T06:57:24.414Z"
+        "lastUpdated": "2026-01-28T08:00:10.199Z"
       }
     },
     "jobs": {
@@ -105,33 +105,9 @@
   "session": {
     "startedAt": "2026-01-28T00:37:09.466Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-01-28T06:57:24.414Z"
+    "lastActivity": "2026-01-28T08:00:47.409Z"
   },
   "history": [
-    {
-      "timestamp": "2026-01-28T05:15:22.876Z",
-      "feature": "panorama-korea",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T05:15:35.280Z",
-      "feature": "panorama-korea",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T05:15:47.156Z",
-      "feature": "panorama-korea",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T05:16:01.847Z",
-      "feature": "panorama-korea",
-      "phase": "do",
-      "action": "updated"
-    },
     {
       "timestamp": "2026-01-28T05:16:38.311Z",
       "feature": "widgets",
@@ -704,6 +680,30 @@
     },
     {
       "timestamp": "2026-01-28T06:57:24.414Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T07:59:15.418Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T07:59:26.768Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T07:59:36.025Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T08:00:10.199Z",
       "feature": "widgets",
       "phase": "do",
       "action": "updated"
