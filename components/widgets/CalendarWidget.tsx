@@ -31,9 +31,8 @@ export function CalendarWidget({
   calendarSources = []
 }: CalendarWidgetProps) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [nextEvent, setNextEvent] = useState<CalendarEvent | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [holiday, setHoliday] = useState<string | null>(null);
 
   // 캘린더 데이터 로드
   useEffect(() => {
@@ -89,17 +88,37 @@ export function CalendarWidget({
         const allEventsArrays = await Promise.all(allEventsPromises);
         const allEvents = allEventsArrays.flat();
 
+        // 오늘 날짜 필터링
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayEnd = new Date(today);
+        todayEnd.setHours(23, 59, 59, 999);
+
+        const todayEvents = allEvents.filter(event => {
+          const eventDate = new Date(event.start);
+          return eventDate >= today && eventDate <= todayEnd;
+        });
+
         // 시작 시간 순으로 정렬
-        allEvents.sort((a, b) => a.start.getTime() - b.start.getTime());
+        todayEvents.sort((a, b) => a.start.getTime() - b.start.getTime());
 
-        setEvents(allEvents);
+        // 공휴일 감지 (제목에 "공휴일", "holiday" 포함 또는 allDay인 특정 이벤트)
+        const holidayEvent = todayEvents.find(e =>
+          e.allDay && (
+            e.title.includes('공휴일') ||
+            e.title.includes('Holiday') ||
+            e.sourceName?.includes('공휴일') ||
+            e.sourceName?.includes('Holiday')
+          )
+        );
 
-        // 다음 예정 일정 찾기 (현재 표시 중인 이벤트 다음)
-        if (allEvents.length > 1) {
-          setNextEvent(allEvents[1]);
+        if (holidayEvent) {
+          setHoliday(holidayEvent.title);
         } else {
-          setNextEvent(null);
+          setHoliday(null);
         }
+
+        setEvents(todayEvents);
       } catch (error) {
         console.error('캘린더 로딩 실패:', error);
         setEvents([]);
@@ -113,15 +132,6 @@ export function CalendarWidget({
     const interval = setInterval(loadEvents, 300000);
     return () => clearInterval(interval);
   }, [calendarSources]);
-
-  // 이벤트 자동 전환
-  useEffect(() => {
-    if (events.length <= 1 || rotationSeconds <= 0) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % events.length);
-    }, rotationSeconds * 1000);
-    return () => clearInterval(interval);
-  }, [events.length, rotationSeconds]);
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('ko-KR', {
@@ -146,24 +156,6 @@ export function CalendarWidget({
     );
   }
 
-  if (events.length === 0) {
-    return (
-      <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 bg-purple-500/30 rounded-full flex items-center justify-center">
-            <span className="text-lg">📅</span>
-          </div>
-          <h2 className="text-lg font-semibold text-white">오늘의 일정</h2>
-        </div>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-gray-400 text-xl">오늘은 일정이 없습니다</div>
-        </div>
-      </div>
-    );
-  }
-
-  const currentEvent = events[currentIndex];
-
   const today = new Date();
   const dayOfMonth = today.getDate();
   const dayOfWeek = today.toLocaleDateString('ko-KR', { weekday: 'long' });
@@ -176,88 +168,90 @@ export function CalendarWidget({
           <span className="text-lg">📅</span>
         </div>
         <h2 className="text-lg font-semibold text-white">오늘의 일정</h2>
-        {events.length > 1 && (
-          <div className="ml-auto text-sm text-gray-400">
-            {currentIndex + 1} / {events.length}
-          </div>
-        )}
       </div>
 
-      {/* Event Content - 2 Column Layout: Date Left, Content Right */}
+      {/* Content - 2 Column Layout: Date Left, Events List Right */}
       <div className="flex-1 flex gap-6">
-        {/* Left: Date and Day */}
+        {/* Left: Date, Day, and Holiday */}
         <div className="flex flex-col items-center justify-start pt-6">
           <div className="text-[8vw] md:text-[6vw] font-bold text-white leading-none">
             {dayOfMonth}
           </div>
-          <div className="text-[2.5vw] md:text-[2vw] font-semibold text-purple-200 mt-2">
-            {dayOfWeek}
-          </div>
-        </div>
-
-        {/* Right: Event Details */}
-        <div className="flex-1 flex flex-col justify-center border-l border-white/10 pl-6">
-          {/* Event Title with Color Bar */}
-          <div className="flex items-start gap-3 mb-4">
-            {currentEvent.color && (
-              <div
-                className="w-2 h-16 rounded-full flex-shrink-0"
-                style={{ backgroundColor: currentEvent.color }}
-              />
-            )}
-            <div className="flex-1">
-              <h3
-                key={`title-${currentIndex}`}
-                className="text-[3vw] md:text-[2.5vw] font-bold text-white line-clamp-2 animate-[slideUp_0.5s_ease-out]"
-              >
-                {currentEvent.title}
-              </h3>
-              {currentEvent.sourceName && (
-                <p className="text-[1vw] md:text-[0.8vw] text-gray-400 mt-2">
-                  {currentEvent.sourceName}
-                </p>
-              )}
+          <div className="flex items-center gap-2 mt-2">
+            <div className="text-[2.5vw] md:text-[2vw] font-semibold text-purple-200">
+              {dayOfWeek}
             </div>
+            {holiday && (
+              <div className="text-[1.5vw] md:text-[1.2vw] text-red-300 font-semibold">
+                🎉 {holiday}
+              </div>
+            )}
           </div>
-
-          {/* Event Time */}
-          {!currentEvent.allDay && (
-            <div className="flex items-center gap-2 text-[1.5vw] md:text-[1.2vw] text-purple-300 mb-3">
-              <span>🕐</span>
-              <span>
-                {formatTime(currentEvent.start)}
-                {currentEvent.start.getTime() !== currentEvent.end.getTime() &&
-                  ` - ${formatTime(currentEvent.end)}`
-                }
-              </span>
+          {holiday && (
+            <div className="text-[1.2vw] md:text-[1vw] text-red-200 mt-2 text-center">
+              {holiday}
             </div>
           )}
+        </div>
 
-          {/* Event Description */}
-          {currentEvent.description && (
-            <p
-              key={`desc-${currentIndex}`}
-              className="text-[1.3vw] md:text-[1vw] text-gray-300 line-clamp-2 animate-[slideUp_0.5s_ease-out] delay-100"
-            >
-              {currentEvent.description}
-            </p>
+        {/* Right: Events List */}
+        <div className="flex-1 flex flex-col border-l border-white/10 pl-6 overflow-y-auto">
+          {events.length === 0 ? (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-gray-400 text-[1.5vw] md:text-[1.2vw]">오늘은 일정이 없습니다</div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {events.map((event, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white/5 rounded-xl p-3 border border-white/10 hover:border-purple-400/30 transition-all"
+                >
+                  {/* Event Title with Color Bar */}
+                  <div className="flex items-start gap-3 mb-2">
+                    {event.color && (
+                      <div
+                        className="w-1.5 h-12 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: event.color }}
+                      />
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-[1.8vw] md:text-[1.5vw] font-bold text-white line-clamp-2">
+                        {event.title}
+                      </h3>
+                      {event.sourceName && (
+                        <p className="text-[0.8vw] md:text-[0.6vw] text-gray-400 mt-1">
+                          {event.sourceName}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Event Time */}
+                  {!event.allDay && (
+                    <div className="flex items-center gap-2 text-[1.2vw] md:text-[1vw] text-purple-300 mb-2">
+                      <span>🕐</span>
+                      <span>
+                        {formatTime(event.start)}
+                        {event.start.getTime() !== event.end.getTime() &&
+                          ` - ${formatTime(event.end)}`
+                        }
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Event Description */}
+                  {event.description && (
+                    <p className="text-[1vw] md:text-[0.8vw] text-gray-300 line-clamp-2">
+                      {event.description}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
-
-      {/* Progress Dots */}
-      {events.length > 1 && (
-        <div className="flex justify-center gap-1 mt-4">
-          {events.map((_, idx) => (
-            <div
-              key={idx}
-              className={`h-1 rounded-full transition-all ${
-                idx === currentIndex ? 'w-4 bg-purple-400' : 'w-1 bg-white/20'
-              }`}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
