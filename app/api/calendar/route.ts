@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import * as ical from 'node-ical';
+import ICAL from 'ical.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,50 +31,46 @@ export async function GET(request: Request) {
     }
 
     const icalData = await response.text();
-    const events = await ical.async.parseICS(icalData);
+
+    // ical.js로 파싱
+    const jcalData = ICAL.parse(icalData);
+    const comp = new ICAL.Component(jcalData);
+    const vevents = comp.getAllSubcomponents('vevent');
 
     // 오늘 날짜 기준으로 필터링
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const todayEnd = new Date(today);
-    todayEnd.setHours(23, 59, 59, 999);
 
     const todayEvents: CalendarEvent[] = [];
     const upcomingEvents: CalendarEvent[] = [];
 
-    for (const k in events) {
-      const event = events[k];
-      if (event.type === 'VEVENT') {
-        const start = event.start ? new Date(event.start) : null;
-        const end = event.end ? new Date(event.end) : null;
+    for (const vevent of vevents) {
+      const event = new ICAL.Event(vevent);
 
-        if (start) {
-          const eventDate = new Date(start);
-          eventDate.setHours(0, 0, 0, 0);
+      const startTime = event.startDate?.toJSDate();
+      const endTime = event.endDate?.toJSDate();
 
-          // 오늘 날짜의 이벤트
-          if (eventDate.getTime() === today.getTime()) {
-            todayEvents.push({
-              id: event.uid || k,
-              title: event.summary || '제목 없음',
-              description: event.description || '',
-              start: start,
-              end: end || start,
-              allDay: !event.start.getHours && !event.start.getMinutes,
-            });
-          }
-          // 미래 이벤트 (오늘 이후)
-          else if (eventDate.getTime() > today.getTime()) {
-            upcomingEvents.push({
-              id: event.uid || k,
-              title: event.summary || '제목 없음',
-              description: event.description || '',
-              start: start,
-              end: end || start,
-              allDay: !event.start.getHours && !event.start.getMinutes,
-            });
-          }
-        }
+      if (!startTime) continue;
+
+      const eventDate = new Date(startTime);
+      eventDate.setHours(0, 0, 0, 0);
+
+      const calEvent: CalendarEvent = {
+        id: event.uid || Math.random().toString(),
+        title: event.summary || '제목 없음',
+        description: event.description || '',
+        start: startTime,
+        end: endTime || startTime,
+        allDay: event.startDate?.isDate || false,
+      };
+
+      // 오늘 날짜의 이벤트
+      if (eventDate.getTime() === today.getTime()) {
+        todayEvents.push(calEvent);
+      }
+      // 미래 이벤트 (오늘 이후)
+      else if (eventDate.getTime() > today.getTime()) {
+        upcomingEvents.push(calEvent);
       }
     }
 

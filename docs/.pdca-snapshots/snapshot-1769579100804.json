@@ -1,0 +1,703 @@
+{
+  "timestamp": "2026-01-28T05:45:00.800Z",
+  "reason": "compaction",
+  "status": {
+    "version": "2.0",
+    "lastUpdated": "2026-01-28T05:44:18.706Z",
+    "activeFeatures": [
+      "panorama-korea",
+      "widgets",
+      "jobs",
+      "api",
+      "news",
+      "calendar"
+    ],
+    "primaryFeature": "calendar",
+    "features": {
+      "panorama-korea": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-01-28T00:44:12.264Z",
+          "lastUpdated": "2026-01-28T05:41:14.279Z"
+        }
+      },
+      "widgets": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-01-28T00:46:45.282Z",
+          "lastUpdated": "2026-01-28T05:33:26.805Z"
+        }
+      },
+      "jobs": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-01-28T01:09:46.114Z",
+          "lastUpdated": "2026-01-28T05:39:41.906Z"
+        }
+      },
+      "api": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-01-28T01:52:06.628Z",
+          "lastUpdated": "2026-01-28T01:59:03.267Z"
+        }
+      },
+      "news": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-01-28T05:08:57.542Z",
+          "lastUpdated": "2026-01-28T05:08:57.542Z"
+        }
+      },
+      "calendar": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-01-28T05:14:05.978Z",
+          "lastUpdated": "2026-01-28T05:44:04.303Z"
+        }
+      }
+    },
+    "pipeline": {
+      "currentPhase": 1,
+      "level": "Dynamic",
+      "phaseHistory": []
+    },
+    "session": {
+      "startedAt": "2026-01-28T00:37:09.466Z",
+      "onboardingCompleted": false,
+      "lastActivity": "2026-01-28T05:44:18.706Z"
+    },
+    "history": [
+      {
+        "timestamp": "2026-01-28T02:08:31.946Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:10:16.113Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:12:18.526Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:14:23.309Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:22:32.056Z",
+        "feature": "jobs",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:23:11.779Z",
+        "feature": "jobs",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:23:21.161Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:23:31.388Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:23:38.596Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:24:16.720Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:24:27.982Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:24:34.211Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:25:43.855Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:25:51.351Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:26:00.987Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:27:27.201Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:27:45.437Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:27:52.981Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:27:59.863Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:28:39.985Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:28:45.360Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:28:53.477Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:29:01.465Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:29:07.838Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:31:50.139Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:32:21.462Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:32:27.868Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:32:38.231Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:32:48.211Z",
+        "feature": "jobs",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:32:58.692Z",
+        "feature": "jobs",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:33:17.862Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:33:28.532Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:35:52.923Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:36:04.059Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:36:37.460Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:36:45.183Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:36:51.604Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:36:58.502Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:37:14.458Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:37:22.551Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T02:38:52.435Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:08:57.542Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:09:25.660Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:09:48.668Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:10:19.524Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:10:30.313Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:11:16.204Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:11:43.826Z",
+        "feature": "jobs",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:14:05.978Z",
+        "feature": "calendar",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:14:40.319Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:15:01.928Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:15:22.876Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:15:35.280Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:15:47.156Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:16:01.847Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:16:38.311Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:17:19.312Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:17:46.513Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:21:57.018Z",
+        "feature": "calendar",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:22:08.534Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:22:46.777Z",
+        "feature": "calendar",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:23:00.484Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:23:55.499Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:26:51.991Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:26:53.088Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:27:06.808Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:27:07.953Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:27:40.528Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:27:41.629Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:27:42.711Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:28:08.013Z",
+        "feature": "calendar",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:28:30.823Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:28:31.907Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:28:33.016Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:29:31.034Z",
+        "feature": "calendar",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:29:32.108Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:29:54.324Z",
+        "feature": "jobs",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:30:05.731Z",
+        "feature": "jobs",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:30:16.204Z",
+        "feature": "jobs",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:31:44.495Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:32:12.394Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:32:13.478Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:32:28.919Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:32:29.999Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:32:31.069Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:33:07.433Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:33:08.543Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:33:09.626Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:33:25.712Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:33:26.805Z",
+        "feature": "widgets",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:34:54.931Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:34:56.011Z",
+        "feature": "jobs",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:37:26.350Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:37:27.432Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:37:28.646Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:39:36.299Z",
+        "feature": "jobs",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:39:41.906Z",
+        "feature": "jobs",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:41:06.472Z",
+        "feature": "calendar",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:41:14.279Z",
+        "feature": "panorama-korea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-01-28T05:44:04.303Z",
+        "feature": "calendar",
+        "phase": "do",
+        "action": "updated"
+      }
+    ]
+  }
+}

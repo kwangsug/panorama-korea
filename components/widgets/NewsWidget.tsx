@@ -11,7 +11,7 @@ interface NewsWidgetProps {
 export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newsSource, setNewsSource] = useState<'naver' | 'yonhap'>('naver');
+  const [newsSource, setNewsSource] = useState<'naver' | 'yonhap' | 'google'>('naver');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -19,6 +19,7 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
   const [swipeAxis, setSwipeAxis] = useState<'horizontal' | 'vertical' | null>(null);
+  const [selectedCity, setSelectedCity] = useState('Seoul');
 
   useEffect(() => {
     const savedSettings = localStorage.getItem('panorama-settings');
@@ -28,6 +29,9 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
         if (settings.newsSource) {
           setNewsSource(settings.newsSource);
         }
+        if (settings.selectedCity) {
+          setSelectedCity(settings.selectedCity);
+        }
       } catch (error) {
         console.error('설정 로드 실패:', error);
       }
@@ -36,15 +40,19 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
 
   const loadNews = useCallback(async () => {
     try {
-      const newsData = await getNews(newsSource);
-      setNews(newsData);
+      const response = await fetch(`/api/news?source=${newsSource}&city=${selectedCity}`);
+      if (!response.ok) {
+        throw new Error('뉴스 로드 실패');
+      }
+      const data = await response.json();
+      setNews(data.news || []);
     } catch (error) {
       console.error('뉴스 로딩 실패:', error);
       setNews(getMockNews());
     } finally {
       setLoading(false);
     }
-  }, [newsSource]);
+  }, [newsSource, selectedCity]);
 
   useEffect(() => {
     loadNews();
@@ -203,8 +211,61 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-white">주요 뉴스</h2>
-            <p className="text-xs text-gray-400">{newsSource === 'naver' ? '네이버' : '연합'} 뉴스</p>
+            <p className="text-xs text-gray-400">
+              {newsSource === 'naver' ? '네이버' : newsSource === 'yonhap' ? '연합' : '구글'} 뉴스
+            </p>
           </div>
+        </div>
+        {/* 뉴스 소스 선택 버튼 */}
+        <div className="flex gap-1">
+          <button
+            onClick={() => {
+              setNewsSource('naver');
+              localStorage.setItem('panorama-settings', JSON.stringify({
+                ...JSON.parse(localStorage.getItem('panorama-settings') || '{}'),
+                newsSource: 'naver'
+              }));
+            }}
+            className={`px-2 py-1 rounded text-xs transition-colors ${
+              newsSource === 'naver'
+                ? 'bg-green-500/30 text-green-300'
+                : 'bg-white/10 text-gray-400 hover:bg-white/20'
+            }`}
+          >
+            네이버
+          </button>
+          <button
+            onClick={() => {
+              setNewsSource('yonhap');
+              localStorage.setItem('panorama-settings', JSON.stringify({
+                ...JSON.parse(localStorage.getItem('panorama-settings') || '{}'),
+                newsSource: 'yonhap'
+              }));
+            }}
+            className={`px-2 py-1 rounded text-xs transition-colors ${
+              newsSource === 'yonhap'
+                ? 'bg-green-500/30 text-green-300'
+                : 'bg-white/10 text-gray-400 hover:bg-white/20'
+            }`}
+          >
+            연합
+          </button>
+          <button
+            onClick={() => {
+              setNewsSource('google');
+              localStorage.setItem('panorama-settings', JSON.stringify({
+                ...JSON.parse(localStorage.getItem('panorama-settings') || '{}'),
+                newsSource: 'google'
+              }));
+            }}
+            className={`px-2 py-1 rounded text-xs transition-colors ${
+              newsSource === 'google'
+                ? 'bg-green-500/30 text-green-300'
+                : 'bg-white/10 text-gray-400 hover:bg-white/20'
+            }`}
+          >
+            구글
+          </button>
         </div>
       </div>
 
