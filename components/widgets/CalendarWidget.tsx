@@ -50,22 +50,36 @@ export function CalendarWidget({
         // 모든 활성화된 소스에서 이벤트 가져오기
         const allEventsPromises = enabledSources.map(async (source) => {
           try {
+            // URL이 비어있으면 스킵
+            if (!source.url || source.url.trim() === '') {
+              console.warn(`캘린더 URL이 비어있음: ${source.name}`);
+              return [];
+            }
+
             const url = `/api/calendar?url=${encodeURIComponent(source.url)}`;
             const response = await fetch(url);
             if (!response.ok) {
-              console.error(`캘린더 로드 실패: ${source.name}`);
+              console.error(`캘린더 로드 실패: ${source.name}`, response.status);
               return [];
             }
             const data = await response.json();
 
+            // events가 배열인지 확인
+            if (!Array.isArray(data.events)) {
+              console.error(`캘린더 응답이 배열이 아님: ${source.name}`, data);
+              return [];
+            }
+
             // Date 문자열을 Date 객체로 변환하고 색상과 소스명 추가
-            return (data.events || []).map((event: any) => ({
-              ...event,
-              start: new Date(event.start),
-              end: new Date(event.end),
-              color: source.color,
-              sourceName: source.name,
-            }));
+            return data.events
+              .filter((event: any) => event && event.start && event.end)
+              .map((event: any) => ({
+                ...event,
+                start: new Date(event.start),
+                end: new Date(event.end),
+                color: source.color,
+                sourceName: source.name,
+              }));
           } catch (error) {
             console.error(`캘린더 로딩 실패: ${source.name}`, error);
             return [];
@@ -80,19 +94,12 @@ export function CalendarWidget({
 
         setEvents(allEvents);
 
-        // 다음 예정 일정 찾기 (오늘 이후 첫 번째 이벤트)
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
-        const upcomingEvent = allEvents.find(event => {
-          const eventDate = new Date(event.start);
-          eventDate.setHours(0, 0, 0, 0);
-          return eventDate.getTime() >= tomorrow.getTime();
-        });
-
-        setNextEvent(upcomingEvent || null);
+        // 다음 예정 일정 찾기 (현재 표시 중인 이벤트 다음)
+        if (allEvents.length > 1) {
+          setNextEvent(allEvents[1]);
+        } else {
+          setNextEvent(null);
+        }
       } catch (error) {
         console.error('캘린더 로딩 실패:', error);
         setEvents([]);
@@ -178,39 +185,25 @@ export function CalendarWidget({
         )}
       </div>
 
-      {/* Event Content - 2 Column Layout */}
-      <div className="flex-1 flex gap-6">
-        {/* Left: Calendar Card */}
-        <div className="flex flex-col items-center justify-center">
-          {/* Calendar Date Card */}
-          <div className="relative bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 p-6 min-w-[200px]">
-            {/* Calendar Header */}
-            <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-t-3xl py-3 px-4">
-              <div className="text-white text-center font-semibold">
-                {year}년 {month}
-              </div>
+      {/* Event Content - Single Column Layout */}
+      <div className="flex-1 flex flex-col justify-center">
+        {/* Date and Day Display - Large */}
+        <div className="flex items-baseline gap-3 md:gap-4 mb-6 md:mb-8">
+          <div className="text-[8vw] md:text-[6vw] font-bold text-white leading-none">
+            {dayOfMonth}
+          </div>
+          <div className="flex flex-col">
+            <div className="text-[2.5vw] md:text-[2vw] font-semibold text-purple-200 mb-1 md:mb-2">
+              {dayOfWeek}
             </div>
-
-            {/* Date Display */}
-            <div className="mt-10 flex flex-col items-center">
-              <div className="text-[100px] font-bold text-white leading-none mb-2">
-                {dayOfMonth}
-              </div>
-              <div className="text-2xl font-semibold text-purple-200">
-                {dayOfWeek}
-              </div>
-            </div>
-
-            {/* Calendar Binding Holes Effect */}
-            <div className="absolute top-14 left-0 right-0 flex justify-around px-8">
-              <div className="w-3 h-3 rounded-full bg-black/20" />
-              <div className="w-3 h-3 rounded-full bg-black/20" />
+            <div className="text-[1.3vw] md:text-[1vw] text-gray-400">
+              {year}년 {month}
             </div>
           </div>
         </div>
 
-        {/* Right: Event Details */}
-        <div className="flex-1 flex flex-col justify-center border-l border-white/10 pl-6">
+        {/* Event Details */}
+        <div className="border-t border-white/10 pt-6">
           {/* Event Title with Color Bar */}
           <div className="flex items-start gap-3 mb-4">
             {currentEvent.color && (

@@ -41,8 +41,7 @@ export async function GET(request: Request) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const todayEvents: CalendarEvent[] = [];
-    const upcomingEvents: CalendarEvent[] = [];
+    const allEvents: CalendarEvent[] = [];
 
     for (const vevent of vevents) {
       const event = new ICAL.Event(vevent);
@@ -55,35 +54,25 @@ export async function GET(request: Request) {
       const eventDate = new Date(startTime);
       eventDate.setHours(0, 0, 0, 0);
 
-      const calEvent: CalendarEvent = {
-        id: event.uid || Math.random().toString(),
-        title: event.summary || '제목 없음',
-        description: event.description || '',
-        start: startTime,
-        end: endTime || startTime,
-        allDay: event.startDate?.isDate || false,
-      };
-
-      // 오늘 날짜의 이벤트
-      if (eventDate.getTime() === today.getTime()) {
-        todayEvents.push(calEvent);
-      }
-      // 미래 이벤트 (오늘 이후)
-      else if (eventDate.getTime() > today.getTime()) {
-        upcomingEvents.push(calEvent);
+      // 오늘 또는 미래 이벤트만 포함
+      if (eventDate.getTime() >= today.getTime()) {
+        const calEvent: CalendarEvent = {
+          id: event.uid || Math.random().toString(),
+          title: event.summary || '제목 없음',
+          description: event.description || '',
+          start: startTime,
+          end: endTime || startTime,
+          allDay: event.startDate?.isDate || false,
+        };
+        allEvents.push(calEvent);
       }
     }
 
     // 시작 시간 순으로 정렬
-    todayEvents.sort((a, b) => a.start.getTime() - b.start.getTime());
-    upcomingEvents.sort((a, b) => a.start.getTime() - b.start.getTime());
-
-    // 다음 예정 일정 (가장 가까운 미래 일정 1개)
-    const nextEvent = upcomingEvents.length > 0 ? upcomingEvents[0] : null;
+    allEvents.sort((a, b) => a.start.getTime() - b.start.getTime());
 
     return NextResponse.json({
-      events: todayEvents,
-      nextEvent: nextEvent,
+      events: allEvents,
       source: customUrl ? 'custom' : 'default',
     });
   } catch (error) {

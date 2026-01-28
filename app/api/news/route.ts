@@ -92,15 +92,21 @@ async function handleNaverNews(source: string, city: string) {
 
     const data = await response.json();
 
-    // 네이버 API 응답을 NewsItem 형식으로 변환
-    const news: NewsItem[] = data.items.map((item: any, index: number) => ({
-      id: `${Date.now()}-${index}`,
-      title: item.title.replace(/<\/?b>/g, ''), // HTML 태그 제거
-      summary: item.description.replace(/<\/?b>/g, '').slice(0, 150),
-      url: item.link,
-      source: extractSource(item.title),
-      publishedAt: new Date(item.pubDate),
-    }));
+    // 네이버 API 응답을 NewsItem 형식으로 변환 및 의미 없는 제목 필터링
+    const news: NewsItem[] = data.items
+      .map((item: any, index: number) => {
+        const cleanTitle = decodeHTMLEntities(item.title.replace(/<\/?b>/g, ''));
+        const cleanSummary = decodeHTMLEntities(item.description.replace(/<\/?b>/g, '')).slice(0, 150);
+        return {
+          id: `${Date.now()}-${index}`,
+          title: cleanTitle,
+          summary: cleanSummary,
+          url: item.link,
+          source: extractSource(cleanTitle),
+          publishedAt: new Date(item.pubDate),
+        };
+      })
+      .filter((item) => !isMeaninglessTitle(item.title));
 
     return NextResponse.json(
       { news, source: 'naver' },
@@ -158,15 +164,22 @@ async function handleGoogleNews(city: string) {
 
     const data = await response.json();
 
-    // SerpAPI 응답을 NewsItem 형식으로 변환
-    const news: NewsItem[] = (data.news_results || []).slice(0, 20).map((item: any, index: number) => ({
-      id: `google-${Date.now()}-${index}`,
-      title: item.title || '',
-      summary: item.snippet || item.highlight?.snippet || '',
-      url: item.link || '',
-      source: item.source?.name || 'Google News',
-      publishedAt: item.date ? new Date(item.date) : new Date(),
-    }));
+    // SerpAPI 응답을 NewsItem 형식으로 변환 및 의미 없는 제목 필터링
+    const news: NewsItem[] = (data.news_results || [])
+      .slice(0, 20)
+      .map((item: any, index: number) => {
+        const cleanTitle = decodeHTMLEntities(item.title || '');
+        const cleanSummary = decodeHTMLEntities(item.snippet || item.highlight?.snippet || '');
+        return {
+          id: `google-${Date.now()}-${index}`,
+          title: cleanTitle,
+          summary: cleanSummary,
+          url: item.link || '',
+          source: item.source?.name || 'Google News',
+          publishedAt: item.date ? new Date(item.date) : new Date(),
+        };
+      })
+      .filter((item) => !isMeaninglessTitle(item.title));
 
     return NextResponse.json(
       { news, source: 'google' },
@@ -185,6 +198,48 @@ async function handleGoogleNews(city: string) {
       { status: 200 }
     );
   }
+}
+
+/**
+ * HTML 엔티티 디코딩
+ */
+function decodeHTMLEntities(text: string): string {
+  const entities: Record<string, string> = {
+    '&quot;': '"',
+    '&apos;': "'",
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&#39;': "'",
+    '&#x27;': "'",
+    '&#x2F;': '/',
+  };
+
+  return text.replace(/&[^;]+;/g, (entity) => entities[entity] || entity);
+}
+
+/**
+ * 의미 없는 제목인지 확인
+ */
+function isMeaninglessTitle(title: string): boolean {
+  const meaninglessPatterns = [
+    '이 시각 주요 뉴스',
+    '이시각 주요뉴스',
+    '주요 뉴스',
+    '주요뉴스',
+    '이 시각 뉴스',
+    '이시각 뉴스',
+    '속보 모음',
+    '뉴스 모음',
+  ];
+
+  // 정확히 일치하거나 너무 짧은 제목 필터링
+  const trimmedTitle = title.trim();
+  if (trimmedTitle.length < 10) return true;
+
+  return meaninglessPatterns.some(pattern =>
+    trimmedTitle === pattern || trimmedTitle.startsWith(pattern)
+  );
 }
 
 /**

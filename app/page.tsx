@@ -48,6 +48,10 @@ export default function Home() {
   const [autoSwitchSeconds, setAutoSwitchSeconds] = useState(30);
   const [newsRotationSeconds, setNewsRotationSeconds] = useState(15);
   const [jobRotationSeconds, setJobRotationSeconds] = useState(10);
+  const [serpApiKey, setSerpApiKey] = useState<string>('');
+  const [financeDataSources, setFinanceDataSources] = useState<string[]>([
+    'https://serpapi.com/search?engine=google_finance'
+  ]);
   const [calendarSources, setCalendarSources] = useState<Array<{
     id: string;
     url: string;
@@ -75,6 +79,8 @@ export default function Home() {
         if (settings.autoSwitchSeconds) setAutoSwitchSeconds(settings.autoSwitchSeconds);
         if (settings.newsRotationSeconds) setNewsRotationSeconds(settings.newsRotationSeconds);
         if (settings.jobRotationSeconds) setJobRotationSeconds(settings.jobRotationSeconds);
+        if (settings.serpApiKey) setSerpApiKey(settings.serpApiKey);
+        if (settings.financeDataSources) setFinanceDataSources(settings.financeDataSources);
         if (settings.calendarSources) setCalendarSources(settings.calendarSources);
       } catch (e) {
         console.error('설정 로드 실패:', e);
@@ -567,6 +573,26 @@ export default function Home() {
               </div>
               <p className="mt-2 text-xs text-gray-400">
                 0으로 설정하면 자동 전환 비활성화
+              </p>
+            </div>
+
+            {/* SerpAPI 키 설정 */}
+            <div className="bg-white/10 rounded-lg p-4">
+              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                <span>🔑</span> SerpAPI 키
+              </h3>
+              <input
+                type="password"
+                value={serpApiKey}
+                onChange={(e) => {
+                  setSerpApiKey(e.target.value);
+                  saveSettings({ serpApiKey: e.target.value });
+                }}
+                placeholder="SerpAPI 키를 입력하세요"
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm"
+              />
+              <p className="mt-2 text-xs text-gray-400">
+                구글 뉴스와 금융 정보에 사용됩니다 (선택사항)
               </p>
             </div>
 

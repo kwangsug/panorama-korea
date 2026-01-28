@@ -121,42 +121,70 @@ export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
         )}
       </div>
 
-      {/* Market Content - Single Column List */}
-      <div className="flex-1 flex flex-col justify-center">
-        <div className="space-y-3">
-          {markets.slice(0, 4).map((market, idx) => {
-            const isPos = market.change.startsWith('+');
-            const isNeg = market.change.startsWith('-');
-            const isCurrent = idx === currentIndex;
-            return (
-              <div
-                key={idx}
-                className={`bg-white/5 rounded-xl p-4 border transition-all ${
-                  isCurrent ? 'border-green-400/50 bg-white/10' : 'border-white/10'
-                }`}
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-2xl">{getTypeIcon(market.type)}</span>
-                  <div className="flex-1">
-                    <div className="text-xs text-gray-400">{market.symbol}</div>
-                    <div className="text-lg font-semibold text-white">{market.name}</div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold text-white">{market.price}</div>
-                  <div
-                    className={`flex items-center gap-2 px-3 py-1 rounded-lg ${
-                      isPos ? 'bg-green-500/20 text-green-400' : isNeg ? 'bg-red-500/20 text-red-400' : 'bg-gray-500/20 text-gray-400'
-                    }`}
-                  >
-                    <span className="text-lg">{isPos ? '▲' : isNeg ? '▼' : '—'}</span>
-                    <span className="text-base font-semibold">{market.changePercent}</span>
-                  </div>
+      {/* Market Content - 2 Column Layout */}
+      <div className="flex-1 flex gap-6">
+        {/* Left: Main Stock */}
+        {markets.length > 0 && (
+          <div className="flex-1 flex flex-col justify-center">
+            <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/10 backdrop-blur-sm rounded-3xl shadow-2xl border border-green-500/30 p-4 md:p-6 lg:p-8">
+              <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+                <span className="text-[3vw] md:text-[2.5vw]">{getTypeIcon(markets[0].type)}</span>
+                <div className="flex-1">
+                  <div className="text-[0.7vw] md:text-[0.6vw] text-gray-400">{markets[0].symbol}</div>
+                  <div className="text-[1.8vw] md:text-[1.5vw] font-bold text-white">{markets[0].name}</div>
                 </div>
               </div>
-            );
-          })}
-        </div>
+              <div className="flex items-end justify-between">
+                <div className="text-[4vw] md:text-[3.5vw] font-bold text-white">{markets[0].price}</div>
+                <div
+                  className={`flex items-center gap-2 md:gap-3 px-3 md:px-4 py-1 md:py-2 rounded-xl ${
+                    isPositive ? 'bg-green-500/30 text-green-300' : isNegative ? 'bg-red-500/30 text-red-300' : 'bg-gray-500/30 text-gray-300'
+                  }`}
+                >
+                  <span className="text-[2vw] md:text-[1.8vw]">{isPositive ? '▲' : isNegative ? '▼' : '—'}</span>
+                  <span className="text-[1.5vw] md:text-[1.3vw] font-bold">{markets[0].changePercent}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Right: Other Markets */}
+        {markets.length > 1 && (
+          <div className="w-[20vw] md:w-[18vw] flex flex-col justify-center">
+            <div className="space-y-2 md:space-y-3">
+              {markets.slice(1, 4).map((market, idx) => {
+                const isPos = market.change.startsWith('+');
+                const isNeg = market.change.startsWith('-');
+                return (
+                  <div
+                    key={idx}
+                    className="bg-white/5 rounded-xl p-3 md:p-4 border border-white/10 hover:border-green-400/30 transition-all"
+                  >
+                    <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
+                      <span className="text-[1.5vw] md:text-[1.2vw]">{getTypeIcon(market.type)}</span>
+                      <div className="flex-1">
+                        <div className="text-[0.6vw] md:text-[0.5vw] text-gray-400">{market.symbol}</div>
+                        <div className="text-[0.9vw] md:text-[0.8vw] font-semibold text-white">{market.name}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="text-[1.2vw] md:text-[1vw] font-bold text-white">{market.price}</div>
+                      <div
+                        className={`flex items-center gap-1 md:gap-2 px-2 py-0.5 md:py-1 rounded-lg ${
+                          isPos ? 'bg-green-500/20 text-green-400' : isNeg ? 'bg-red-500/20 text-red-400' : 'bg-gray-500/20 text-gray-400'
+                        }`}
+                      >
+                        <span className="text-[0.8vw] md:text-[0.7vw]">{isPos ? '▲' : isNeg ? '▼' : '—'}</span>
+                        <span className="text-[0.8vw] md:text-[0.7vw] font-semibold">{market.changePercent}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Progress Dots */}
