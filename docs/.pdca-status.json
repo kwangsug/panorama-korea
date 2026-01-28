@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-01-28T08:19:52.228Z",
+  "lastUpdated": "2026-01-28T08:29:15.047Z",
   "activeFeatures": [
     "panorama-korea",
     "widgets",
@@ -21,7 +21,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-01-28T00:44:12.264Z",
-        "lastUpdated": "2026-01-28T08:19:43.546Z"
+        "lastUpdated": "2026-01-28T08:29:04.127Z"
       }
     },
     "widgets": {
@@ -105,15 +105,9 @@
   "session": {
     "startedAt": "2026-01-28T00:37:09.466Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-01-28T08:19:52.228Z"
+    "lastActivity": "2026-01-28T08:29:15.047Z"
   },
   "history": [
-    {
-      "timestamp": "2026-01-28T05:17:46.513Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
     {
       "timestamp": "2026-01-28T05:21:57.018Z",
       "feature": "calendar",
@@ -704,6 +698,12 @@
     },
     {
       "timestamp": "2026-01-28T08:19:43.546Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T08:29:04.127Z",
       "feature": "panorama-korea",
       "phase": "do",
       "action": "updated"

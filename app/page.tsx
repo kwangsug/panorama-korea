@@ -594,6 +594,17 @@ export default function Home() {
               <p className="mt-2 text-xs text-gray-400">
                 구글 뉴스와 금융 정보에 사용됩니다 (선택사항)
               </p>
+              <p className="mt-1 text-xs text-gray-400">
+                API 키 발급:{' '}
+                <a
+                  href="https://serpapi.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:underline"
+                >
+                  serpapi.com
+                </a>
+              </p>
             </div>
 
             {/* 정보 */}
