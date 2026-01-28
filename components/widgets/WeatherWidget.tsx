@@ -140,7 +140,6 @@ export function WeatherWidget() {
 
         {/* 5-Day Forecast - Right */}
         <div className="w-52 flex flex-col flex-shrink-0 mr-8">
-          <h3 className="text-sm font-semibold text-gray-300 mb-2">5일 예보</h3>
           <div className="flex-1 flex flex-col justify-around">
             {forecast.slice(0, 5).map((day, index) => {
               const date = new Date(day.date);

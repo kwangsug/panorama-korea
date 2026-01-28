@@ -121,118 +121,42 @@ export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
         )}
       </div>
 
-      {/* Market Content - 2 Column Layout */}
-      <div className="flex-1 flex gap-6">
-        {/* Left: Market Card */}
-        <div className="flex flex-col items-center justify-center">
-          {/* Market Price Card */}
-          <div className="relative bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 p-6 min-w-[280px]">
-            {/* Card Header with Type */}
-            <div className={`absolute top-0 left-0 right-0 rounded-t-3xl py-3 px-4 bg-gradient-to-r ${
-              currentMarket.type === 'stock' ? 'from-blue-500 to-indigo-500' :
-              currentMarket.type === 'crypto' ? 'from-orange-500 to-yellow-500' :
-              'from-green-500 to-emerald-500'
-            }`}>
-              <div className="flex items-center justify-center gap-2">
-                <span className="text-2xl">{getTypeIcon(currentMarket.type)}</span>
-                <div className="text-white text-center font-semibold">
-                  {getTypeLabel(currentMarket.type)}
-                </div>
-              </div>
-            </div>
-
-            {/* Symbol */}
-            <div className="mt-10 text-center">
-              <div className="text-sm text-gray-400 mb-2">{currentMarket.symbol}</div>
-              <h3
-                key={`name-${currentIndex}`}
-                className="text-2xl font-bold text-white mb-4 animate-[slideUp_0.5s_ease-out]"
-              >
-                {currentMarket.name}
-              </h3>
-            </div>
-
-            {/* Price Display */}
-            <div className="text-center mb-4">
+      {/* Market Content - Single Column List */}
+      <div className="flex-1 flex flex-col justify-center">
+        <div className="space-y-3">
+          {markets.slice(0, 4).map((market, idx) => {
+            const isPos = market.change.startsWith('+');
+            const isNeg = market.change.startsWith('-');
+            const isCurrent = idx === currentIndex;
+            return (
               <div
-                key={`price-${currentIndex}`}
-                className="text-[56px] font-bold text-white leading-none mb-3 animate-[slideUp_0.5s_ease-out] delay-100"
-              >
-                {currentMarket.price}
-              </div>
-            </div>
-
-            {/* Change Indicator */}
-            <div className="flex justify-center">
-              <div
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl ${
-                  isPositive ? 'bg-green-500/20 text-green-400' :
-                  isNegative ? 'bg-red-500/20 text-red-400' :
-                  'bg-gray-500/20 text-gray-400'
+                key={idx}
+                className={`bg-white/5 rounded-xl p-4 border transition-all ${
+                  isCurrent ? 'border-green-400/50 bg-white/10' : 'border-white/10'
                 }`}
               >
-                <span className="text-xl">
-                  {isPositive ? '▲' : isNegative ? '▼' : '—'}
-                </span>
-                <div className="text-center">
-                  <div className="text-lg font-semibold">
-                    {currentMarket.change}
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl">{getTypeIcon(market.type)}</span>
+                  <div className="flex-1">
+                    <div className="text-xs text-gray-400">{market.symbol}</div>
+                    <div className="text-lg font-semibold text-white">{market.name}</div>
                   </div>
-                  <div className="text-sm">
-                    {currentMarket.changePercent}
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-2xl font-bold text-white">{market.price}</div>
+                  <div
+                    className={`flex items-center gap-2 px-3 py-1 rounded-lg ${
+                      isPos ? 'bg-green-500/20 text-green-400' : isNeg ? 'bg-red-500/20 text-red-400' : 'bg-gray-500/20 text-gray-400'
+                    }`}
+                  >
+                    <span className="text-lg">{isPos ? '▲' : isNeg ? '▼' : '—'}</span>
+                    <span className="text-base font-semibold">{market.changePercent}</span>
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Decorative Elements */}
-            <div className="absolute top-16 left-0 right-0 flex justify-around px-8">
-              <div className="w-3 h-3 rounded-full bg-black/20" />
-              <div className="w-3 h-3 rounded-full bg-black/20" />
-            </div>
-          </div>
+            );
+          })}
         </div>
-
-        {/* Right: Other Markets */}
-        {markets.length > 1 && (
-          <div className="flex-1 flex flex-col justify-center border-l border-white/10 pl-6">
-            <div className="text-sm text-gray-400 mb-4">다른 시장</div>
-            <div className="space-y-3">
-              {markets
-                .filter((_, idx) => idx !== currentIndex)
-                .slice(0, 3)
-                .map((market, idx) => {
-                  const isPos = market.change.startsWith('+');
-                  const isNeg = market.change.startsWith('-');
-                  return (
-                    <div
-                      key={idx}
-                      className="bg-white/5 rounded-xl p-3 border border-white/10"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xl">{getTypeIcon(market.type)}</span>
-                        <div className="flex-1">
-                          <div className="text-xs text-gray-400">{market.symbol}</div>
-                          <div className="text-sm font-semibold text-white">{market.name}</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="text-lg font-bold text-white">{market.price}</div>
-                        <div
-                          className={`flex items-center gap-1 text-sm ${
-                            isPos ? 'text-green-400' : isNeg ? 'text-red-400' : 'text-gray-400'
-                          }`}
-                        >
-                          <span>{isPos ? '▲' : isNeg ? '▼' : '—'}</span>
-                          <span>{market.changePercent}</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Progress Dots */}
