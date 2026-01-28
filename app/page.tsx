@@ -11,6 +11,26 @@ type ContentView = 'weather' | 'news' | 'jobs';
 
 const VIEWS: ContentView[] = ['weather', 'news', 'jobs'];
 
+const CITIES: Record<string, string> = {
+  Seoul: '서울',
+  Busan: '부산',
+  Daegu: '대구',
+  Incheon: '인천',
+  Gwangju: '광주',
+  Daejeon: '대전',
+  Ulsan: '울산',
+  Sejong: '세종',
+  Gyeonggi: '경기',
+  Gangwon: '강원',
+  Chungbuk: '충북',
+  Chungnam: '충남',
+  Jeonbuk: '전북',
+  Jeonnam: '전남',
+  Gyeongbuk: '경북',
+  Gyeongnam: '경남',
+  Jeju: '제주',
+};
+
 export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [currentView, setCurrentView] = useState<ContentView>('weather');
@@ -21,7 +41,7 @@ export default function Home() {
   const [showSettingsHint, setShowSettingsHint] = useState(false);
 
   // Settings state
-  const [selectedCity, setSelectedCity] = useState<CityName>('Seoul');
+  const [selectedCity, setSelectedCity] = useState<string>('Seoul');
   const [newsSource, setNewsSource] = useState<'naver' | 'yonhap'>('naver');
   const [autoSwitchSeconds, setAutoSwitchSeconds] = useState(30);
   const [newsRotationSeconds, setNewsRotationSeconds] = useState(15);
@@ -33,7 +53,7 @@ export default function Home() {
     if (saved) {
       try {
         const settings = JSON.parse(saved);
-        if (settings.selectedCity) setSelectedCity(settings.selectedCity);
+        if (settings.selectedCity) setSelectedCity(settings.selectedCity as string);
         if (settings.newsSource) setNewsSource(settings.newsSource);
         if (settings.autoSwitchSeconds) setAutoSwitchSeconds(settings.autoSwitchSeconds);
         if (settings.newsRotationSeconds) setNewsRotationSeconds(settings.newsRotationSeconds);
@@ -284,14 +304,14 @@ export default function Home() {
               <select
                 value={selectedCity}
                 onChange={(e) => {
-                  setSelectedCity(e.target.value as CityName);
+                  setSelectedCity(e.target.value);
                   saveSettings({ selectedCity: e.target.value });
                 }}
                 className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm"
               >
-                {Object.entries(MAJOR_CITIES).map(([key, city]) => (
+                {Object.entries(CITIES).map(([key, name]) => (
                   <option key={key} value={key} className="bg-slate-800">
-                    {city.nameKr}
+                    {name}
                   </option>
                 ))}
               </select>

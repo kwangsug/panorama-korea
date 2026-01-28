@@ -180,6 +180,15 @@ export function JobWidget({ rotationSeconds = 10 }: JobWidgetProps) {
     Ulsan: '울산',
     Incheon: '인천',
     Sejong: '세종',
+    Gyeonggi: '경기',
+    Gangwon: '강원',
+    Chungbuk: '충북',
+    Chungnam: '충남',
+    Jeonbuk: '전북',
+    Jeonnam: '전남',
+    Gyeongbuk: '경북',
+    Gyeongnam: '경남',
+    Jeju: '제주',
   };
 
   // 지역이 여러 개인 경우 설정 도시 우선 표시

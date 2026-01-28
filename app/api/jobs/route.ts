@@ -16,11 +16,20 @@ const CITY_TO_REGION_CODE: Record<string, string> = {
   Seoul: '11',     // 서울
   Busan: '12',     // 부산
   Daegu: '13',     // 대구
+  Incheon: '14',   // 인천
   Gwangju: '15',   // 광주
   Daejeon: '16',   // 대전
   Ulsan: '17',     // 울산
-  Incheon: '18',   // 경기 (인천 포함)
+  Gyeonggi: '18',  // 경기
+  Gangwon: '19',   // 강원
+  Chungbuk: '20',  // 충북
+  Chungnam: '21',  // 충남
   Sejong: '21',    // 충남 (세종 포함)
+  Jeonbuk: '22',   // 전북
+  Jeonnam: '23',   // 전남
+  Gyeongbuk: '24', // 경북
+  Gyeongnam: '25', // 경남
+  Jeju: '26',      // 제주
 };
 
 export async function GET(request: Request) {

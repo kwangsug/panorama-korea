@@ -14,64 +14,55 @@ interface FlipCardProps {
 }
 
 function FlipCard({ value }: FlipCardProps) {
-  const [currentValue, setCurrentValue] = useState(value);
   const [previousValue, setPreviousValue] = useState(value);
   const [isFlipping, setIsFlipping] = useState(false);
 
   useEffect(() => {
-    if (value !== currentValue) {
-      setPreviousValue(currentValue);
+    if (value !== previousValue) {
       setIsFlipping(true);
-
       const timer = setTimeout(() => {
-        setCurrentValue(value);
-      }, 300);
-
-      const endTimer = setTimeout(() => {
+        setPreviousValue(value);
         setIsFlipping(false);
       }, 600);
-
-      return () => {
-        clearTimeout(timer);
-        clearTimeout(endTimer);
-      };
+      return () => clearTimeout(timer);
     }
-  }, [value, currentValue]);
+  }, [value, previousValue]);
 
   const textClass = "text-5xl md:text-6xl lg:text-7xl text-white tabular-nums font-bold";
   const fontStyle = { fontFamily: 'var(--font-bebas), system-ui' };
 
   return (
-    <div className="relative w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28" style={{ perspective: '200px' }}>
-      {/* 하단 고정 패널 */}
+    <div className="relative w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28" style={{ perspective: '300px' }}>
+      {/* 하단 고정 패널 (이전 값 -> 애니메이션 후 현재 값) */}
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-slate-800 to-slate-900 rounded-b-lg border-x border-b border-white/20 overflow-hidden">
         <div className="absolute inset-0 flex items-start justify-center">
           <span className={textClass} style={{ ...fontStyle, transform: 'translateY(-50%)' }}>
-            {currentValue}
+            {previousValue}
           </span>
         </div>
       </div>
 
-      {/* 상단 고정 패널 */}
+      {/* 상단 고정 패널 (현재 값 - 플립 패널 뒤에 숨겨져 있다가 드러남) */}
       <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-slate-600 to-slate-700 rounded-t-lg border-x border-t border-white/20 overflow-hidden">
         <div className="absolute inset-0 flex items-end justify-center">
           <span className={textClass} style={{ ...fontStyle, transform: 'translateY(50%)' }}>
-            {currentValue}
+            {value}
           </span>
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
       </div>
 
-      {/* 플립되는 상단 패널 */}
+      {/* 플립되는 패널 */}
       <div
         className="absolute inset-x-0 top-0 h-1/2 origin-bottom"
         style={{
           transformStyle: 'preserve-3d',
           transform: isFlipping ? 'rotateX(-180deg)' : 'rotateX(0deg)',
-          transition: 'transform 0.6s ease-in-out',
+          transition: isFlipping ? 'transform 0.6s ease-in-out' : 'none',
           zIndex: isFlipping ? 10 : 1,
         }}
       >
+        {/* 앞면 (상단, 이전 값) */}
         <div
           className="absolute inset-0 bg-gradient-to-b from-slate-600 to-slate-700 rounded-t-lg border-x border-t border-white/20 overflow-hidden"
           style={{ backfaceVisibility: 'hidden' }}
@@ -84,6 +75,7 @@ function FlipCard({ value }: FlipCardProps) {
           <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
         </div>
 
+        {/* 뒷면 (하단, 현재 값) */}
         <div
           className="absolute inset-0 bg-gradient-to-t from-slate-900 to-slate-800 rounded-b-lg border-x border-b border-white/20 overflow-hidden"
           style={{
@@ -93,7 +85,7 @@ function FlipCard({ value }: FlipCardProps) {
         >
           <div className="absolute inset-0 flex items-start justify-center">
             <span className={textClass} style={{ ...fontStyle, transform: 'translateY(-50%)' }}>
-              {currentValue}
+              {value}
             </span>
           </div>
         </div>
@@ -123,6 +115,26 @@ function decodeHtmlEntities(text: string): string {
     .replace(/&gt;/g, '>')
     .replace(/&#39;/g, "'")
     .replace(/&apos;/g, "'");
+}
+
+// 제목에서 기업명 패턴 제거
+function cleanJobTitle(title: string, company: string): string {
+  let cleanTitle = title;
+  // 정규식 특수문자 이스케이프
+  const escapedCompany = company.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  
+  const companyPatterns = [
+    new RegExp(`^\\[${escapedCompany}\\]\\s*`, 'i'),
+    new RegExp(`^\\(${escapedCompany}\\)\\s*`, 'i'),
+    new RegExp(`^${escapedCompany}\\s*[-:]\\s*`, 'i'),
+    new RegExp(`^${escapedCompany}\\s+`, 'i'),
+    new RegExp(`\\[${escapedCompany}\\]`, 'gi'),
+    new RegExp(`\\(${escapedCompany}\\)`, 'gi'),
+  ];
+  for (const pattern of companyPatterns) {
+    cleanTitle = cleanTitle.replace(pattern, '').trim();
+  }
+  return cleanTitle;
 }
 
 // 날씨 아이콘 이모지 (WeatherWidget과 통일)
@@ -215,8 +227,9 @@ export function ClockWidget() {
           jobsData.jobs.slice(0, 10).forEach((job: { title: string; company: string }) => {
             const decodedTitle = decodeHtmlEntities(job.title);
             const decodedCompany = decodeHtmlEntities(job.company);
+            const cleanedTitle = cleanJobTitle(decodedTitle, decodedCompany);
             // 기업명 + 제목 형태로 표시
-            jobItems.push({ type: 'job', title: `${decodedCompany} - ${decodedTitle}`, source: '채용' });
+            jobItems.push({ type: 'job', title: `${decodedCompany} - ${cleanedTitle}`, source: '채용' });
           });
         }
 
@@ -300,10 +313,10 @@ export function ClockWidget() {
       {/* 날짜와 날씨 */}
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-2 md:gap-3">
-          <div className="text-base md:text-xl text-white font-medium">
+          <div className="text-xl md:text-2xl text-white font-medium">
             {currentTime.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}
           </div>
-          <div className="text-sm md:text-lg text-gray-400">
+          <div className="text-lg md:text-xl text-gray-400">
             {currentTime.toLocaleDateString('ko-KR', { weekday: 'long' })}
           </div>
         </div>
@@ -318,12 +331,12 @@ export function ClockWidget() {
 
       {/* 뉴스/채용정보 티커 (한 줄) */}
       {tickerItems.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-white/10 overflow-hidden h-9">
+        <div className="mt-3 pt-3 border-t border-white/10 overflow-hidden h-10">
           <div
             key={tickerIndex}
             className="flex items-center gap-2 animate-[slideUp_0.4s_ease-out]"
           >
-            <span className={`text-xs px-2 py-0.5 rounded flex-shrink-0 ${
+            <span className={`text-sm px-2 py-0.5 rounded flex-shrink-0 ${
               tickerItems[tickerIndex].type === 'news'
                 ? 'bg-purple-500/30 text-purple-300'
                 : 'bg-orange-500/30 text-orange-300'
@@ -333,7 +346,7 @@ export function ClockWidget() {
             <div ref={containerRef} className="flex-1 overflow-hidden">
               <span
                 ref={textRef}
-                className="text-sm text-gray-300 whitespace-nowrap inline-block transition-transform duration-[6000ms] ease-linear"
+                className="text-lg text-gray-300 whitespace-nowrap inline-block transition-transform duration-[6000ms] ease-linear"
                 style={{
                   transform: scrollAmount > 0 ? `translateX(-${scrollAmount}px)` : 'translateX(0)',
                 }}

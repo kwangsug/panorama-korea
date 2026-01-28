@@ -41,6 +41,15 @@ export const MAJOR_CITIES = {
   Gwangju: { lat: 35.1595, lon: 126.8526, nameKr: '광주' },
   Ulsan: { lat: 35.5384, lon: 129.3114, nameKr: '울산' },
   Sejong: { lat: 36.4800, lon: 127.2890, nameKr: '세종' },
+  Gyeonggi: { lat: 37.2636, lon: 127.0286, nameKr: '경기' }, // 수원
+  Gangwon: { lat: 37.8813, lon: 127.7298, nameKr: '강원' }, // 춘천
+  Chungbuk: { lat: 36.6424, lon: 127.4890, nameKr: '충북' }, // 청주
+  Chungnam: { lat: 36.6013, lon: 126.6608, nameKr: '충남' }, // 홍성
+  Jeonbuk: { lat: 35.8242, lon: 127.1480, nameKr: '전북' }, // 전주
+  Jeonnam: { lat: 34.8161, lon: 126.4629, nameKr: '전남' }, // 무안
+  Gyeongbuk: { lat: 36.5684, lon: 128.7294, nameKr: '경북' }, // 안동
+  Gyeongnam: { lat: 35.2383, lon: 128.6922, nameKr: '경남' }, // 창원
+  Jeju: { lat: 33.4996, lon: 126.5312, nameKr: '제주' }, // 제주
 } as const;
 
 export type CityName = keyof typeof MAJOR_CITIES;
