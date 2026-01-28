@@ -186,7 +186,7 @@ export function CalendarWidget({
       {/* Event Content - 2 Column Layout: Date Left, Content Right */}
       <div className="flex-1 flex gap-6">
         {/* Left: Date and Day */}
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-start pt-6">
           <div className="text-[8vw] md:text-[6vw] font-bold text-white leading-none">
             {dayOfMonth}
           </div>

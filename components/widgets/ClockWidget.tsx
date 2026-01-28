@@ -143,6 +143,7 @@ function getWeatherEmoji(iconCode: string): string {
 }
 
 export function ClockWidget() {
+  const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [tickerItems, setTickerItems] = useState<TickerItem[]>([]);
@@ -152,6 +153,11 @@ export function ClockWidget() {
   const [isTickerHovered, setIsTickerHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
+
+  // 클라이언트 사이드에서만 렌더링 (hydration 오류 방지)
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 설정에서 선택된 도시 로드
   useEffect(() => {
@@ -299,6 +305,24 @@ export function ClockWidget() {
   const hours = currentTime.getHours().toString().padStart(2, '0');
   const minutes = currentTime.getMinutes().toString().padStart(2, '0');
   const seconds = currentTime.getSeconds().toString().padStart(2, '0');
+
+  // 서버 렌더링 시 플레이스홀더 표시 (hydration 오류 방지)
+  if (!mounted) {
+    return (
+      <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-4 md:p-6 border border-white/10 flex flex-col justify-start">
+        <div className="flex items-center justify-center gap-1 md:gap-2 mb-4 md:mb-6">
+          <div className="w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28 bg-slate-700/50 rounded-lg animate-pulse" />
+          <div className="w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28 bg-slate-700/50 rounded-lg animate-pulse" />
+          <div className="h-20 md:h-24 lg:h-28 px-1" />
+          <div className="w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28 bg-slate-700/50 rounded-lg animate-pulse" />
+          <div className="w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28 bg-slate-700/50 rounded-lg animate-pulse" />
+          <div className="h-20 md:h-24 lg:h-28 px-1" />
+          <div className="w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28 bg-slate-700/50 rounded-lg animate-pulse" />
+          <div className="w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28 bg-slate-700/50 rounded-lg animate-pulse" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-4 md:p-6 border border-white/10 flex flex-col justify-start">
