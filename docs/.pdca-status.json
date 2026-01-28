@@ -1,15 +1,16 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-01-28T05:44:18.706Z",
+  "lastUpdated": "2026-01-28T06:10:45.120Z",
   "activeFeatures": [
     "panorama-korea",
     "widgets",
     "jobs",
     "api",
     "news",
-    "calendar"
+    "calendar",
+    "finance"
   ],
-  "primaryFeature": "calendar",
+  "primaryFeature": "widgets",
   "features": {
     "panorama-korea": {
       "phase": "do",
@@ -20,7 +21,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-01-28T00:44:12.264Z",
-        "lastUpdated": "2026-01-28T05:41:14.279Z"
+        "lastUpdated": "2026-01-28T06:02:26.305Z"
       }
     },
     "widgets": {
@@ -32,7 +33,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-01-28T00:46:45.282Z",
-        "lastUpdated": "2026-01-28T05:33:26.805Z"
+        "lastUpdated": "2026-01-28T06:10:30.247Z"
       }
     },
     "jobs": {
@@ -82,6 +83,18 @@
         "started": "2026-01-28T05:14:05.978Z",
         "lastUpdated": "2026-01-28T05:44:04.303Z"
       }
+    },
+    "finance": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-01-28T05:57:50.796Z",
+        "lastUpdated": "2026-01-28T05:57:50.796Z"
+      }
     }
   },
   "pipeline": {
@@ -92,111 +105,9 @@
   "session": {
     "startedAt": "2026-01-28T00:37:09.466Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-01-28T05:44:18.706Z"
+    "lastActivity": "2026-01-28T06:10:45.120Z"
   },
   "history": [
-    {
-      "timestamp": "2026-01-28T02:08:31.946Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:10:16.113Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:12:18.526Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:14:23.309Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:22:32.056Z",
-      "feature": "jobs",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:23:11.779Z",
-      "feature": "jobs",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:23:21.161Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:23:31.388Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:23:38.596Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:24:16.720Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:24:27.982Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:24:34.211Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:25:43.855Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:25:51.351Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:26:00.987Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:27:27.201Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:27:45.437Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
     {
       "timestamp": "2026-01-28T02:27:52.981Z",
       "feature": "widgets",
@@ -692,6 +603,108 @@
     {
       "timestamp": "2026-01-28T05:44:04.303Z",
       "feature": "calendar",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T05:47:49.660Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T05:50:18.949Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T05:50:25.064Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T05:51:30.224Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T05:51:38.208Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T05:54:51.698Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T05:57:50.796Z",
+      "feature": "finance",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T05:58:22.875Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T05:58:39.251Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T05:58:57.909Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:02:26.305Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:06:06.655Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:06:26.894Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:06:59.854Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:07:53.479Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:08:14.237Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:10:30.247Z",
+      "feature": "widgets",
       "phase": "do",
       "action": "updated"
     }

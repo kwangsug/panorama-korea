@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { getCurrentWeather, type WeatherData, type CityName } from '@/lib/api/weather';
 
 interface TickerItem {
-  type: 'news' | 'job';
+  type: 'news' | 'job' | 'finance';
   title: string;
   source?: string; // RSS 피드 제목
 }
@@ -149,6 +149,7 @@ export function ClockWidget() {
   const [tickerIndex, setTickerIndex] = useState(0);
   const [selectedCity, setSelectedCity] = useState<CityName>('Seoul');
   const [scrollAmount, setScrollAmount] = useState(0);
+  const [isTickerHovered, setIsTickerHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
 
@@ -193,38 +194,54 @@ export function ClockWidget() {
   useEffect(() => {
     const loadTickerData = async () => {
       try {
-        const [newsRes, jobsRes] = await Promise.all([
+        const [newsRes, jobsRes, financeRes] = await Promise.all([
           fetch('/api/news'),
           fetch(`/api/jobs?city=${selectedCity}`),
+          fetch('/api/finance'),
         ]);
         const newsData = await newsRes.json();
         const jobsData = await jobsRes.json();
+        const financeData = await financeRes.json();
 
         const items: TickerItem[] = [];
 
-        // 뉴스 제목 추출 (최대 10개)
+        // 뉴스 제목 추출 (최대 8개)
         const newsItems: TickerItem[] = [];
         if (newsData.news) {
-          newsData.news.slice(0, 10).forEach((article: { title: string }) => {
+          newsData.news.slice(0, 8).forEach((article: { title: string }) => {
             newsItems.push({ type: 'news', title: article.title, source: '뉴스' });
           });
         }
 
-        // 채용정보 제목 추출 (최대 10개) - 기업명 포함
+        // 채용정보 제목 추출 (최대 8개) - 기업명 포함
         const jobItems: TickerItem[] = [];
         if (jobsData.jobs) {
-          jobsData.jobs.slice(0, 10).forEach((job: { title: string; company: string }) => {
+          jobsData.jobs.slice(0, 8).forEach((job: { title: string; company: string }) => {
             const cleanedTitle = cleanJobTitle(job.title, job.company);
             // 기업명 + 제목 형태로 표시
             jobItems.push({ type: 'job', title: `${job.company} - ${cleanedTitle}`, source: '채용' });
           });
         }
 
-        // 뉴스와 채용정보 번갈아 배치 (뉴스 하나, 채용 하나...)
-        const maxLen = Math.max(newsItems.length, jobItems.length);
+        // 금융정보 추출 (모든 항목)
+        const financeItems: TickerItem[] = [];
+        if (financeData.markets) {
+          financeData.markets.forEach((market: { symbol: string; name: string; price: string; change: string; changePercent: string }) => {
+            const arrow = market.change.startsWith('+') ? '▲' : market.change.startsWith('-') ? '▼' : '—';
+            financeItems.push({
+              type: 'finance',
+              title: `${market.symbol} ${market.price} ${arrow} ${market.changePercent}`,
+              source: '금융'
+            });
+          });
+        }
+
+        // 뉴스, 채용, 금융 순환 배치
+        const maxLen = Math.max(newsItems.length, jobItems.length, financeItems.length);
         for (let i = 0; i < maxLen; i++) {
           if (i < newsItems.length) items.push(newsItems[i]);
           if (i < jobItems.length) items.push(jobItems[i]);
+          if (i < financeItems.length) items.push(financeItems[i]);
         }
 
         // 20개까지 로컬 저장
@@ -284,7 +301,7 @@ export function ClockWidget() {
   const seconds = currentTime.getSeconds().toString().padStart(2, '0');
 
   return (
-    <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-4 md:p-6 border border-white/10 flex flex-col justify-center">
+    <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-4 md:p-6 border border-white/10 flex flex-col justify-start">
       {/* 시계 - 플립 카드 */}
       <div className="flex items-center justify-center gap-1 md:gap-2 mb-4 md:mb-6">
         <FlipCard value={hours[0]} />
@@ -316,9 +333,15 @@ export function ClockWidget() {
         )}
       </div>
 
-      {/* 뉴스/채용정보 티커 (한 줄) */}
+      {/* 뉴스/채용/금융 티커 (마우스 오버 시 확장) */}
       {tickerItems.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-white/10 overflow-hidden h-10">
+        <div
+          className="mt-3 pt-3 border-t border-white/10 overflow-hidden transition-all duration-300"
+          style={{ height: isTickerHovered ? 'auto' : '40px' }}
+          onMouseEnter={() => setIsTickerHovered(true)}
+          onMouseLeave={() => setIsTickerHovered(false)}
+        >
+          {/* 현재 티커 아이템 (항상 표시) */}
           <div
             key={tickerIndex}
             className="flex items-center gap-2 animate-[slideUp_0.4s_ease-out]"
@@ -326,22 +349,55 @@ export function ClockWidget() {
             <span className={`text-sm px-2 py-0.5 rounded flex-shrink-0 ${
               tickerItems[tickerIndex].type === 'news'
                 ? 'bg-purple-500/30 text-purple-300'
-                : 'bg-orange-500/30 text-orange-300'
+                : tickerItems[tickerIndex].type === 'job'
+                ? 'bg-orange-500/30 text-orange-300'
+                : 'bg-green-500/30 text-green-300'
             }`}>
-              {tickerItems[tickerIndex].type === 'news' ? '뉴스' : '채용'}
+              {tickerItems[tickerIndex].type === 'news' ? '뉴스' : tickerItems[tickerIndex].type === 'job' ? '채용' : '금융'}
             </span>
             <div ref={containerRef} className="flex-1 overflow-hidden">
               <span
                 ref={textRef}
                 className="text-lg text-gray-300 whitespace-nowrap inline-block transition-transform duration-[6000ms] ease-linear"
                 style={{
-                  transform: scrollAmount > 0 ? `translateX(-${scrollAmount}px)` : 'translateX(0)',
+                  transform: !isTickerHovered && scrollAmount > 0 ? `translateX(-${scrollAmount}px)` : 'translateX(0)',
                 }}
               >
                 {tickerItems[tickerIndex].title}
               </span>
             </div>
           </div>
+
+          {/* 다음 4개 아이템 (호버 시 표시) */}
+          {isTickerHovered && (
+            <div className="space-y-2 mt-2 animate-[slideUp_0.3s_ease-out]">
+              {[1, 2, 3, 4].map((offset) => {
+                const nextIndex = (tickerIndex + offset) % tickerItems.length;
+                const item = tickerItems[nextIndex];
+                return (
+                  <div
+                    key={nextIndex}
+                    className="flex items-center gap-2"
+                  >
+                    <span className={`text-sm px-2 py-0.5 rounded flex-shrink-0 ${
+                      item.type === 'news'
+                        ? 'bg-purple-500/30 text-purple-300'
+                        : item.type === 'job'
+                        ? 'bg-orange-500/30 text-orange-300'
+                        : 'bg-green-500/30 text-green-300'
+                    }`}>
+                      {item.type === 'news' ? '뉴스' : item.type === 'job' ? '채용' : '금융'}
+                    </span>
+                    <div className="flex-1 overflow-hidden">
+                      <span className="text-lg text-gray-300 whitespace-nowrap inline-block">
+                        {item.title}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>

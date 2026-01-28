@@ -6,11 +6,12 @@ import { WeatherWidget } from '@/components/widgets/WeatherWidget';
 import { NewsWidget } from '@/components/widgets/NewsWidget';
 import { JobWidget } from '@/components/widgets/JobWidget';
 import { CalendarWidget } from '@/components/widgets/CalendarWidget';
+import { FinanceWidget } from '@/components/widgets/FinanceWidget';
 import { MAJOR_CITIES, type CityName } from '@/lib/api/weather';
 
-type ContentView = 'weather' | 'news' | 'jobs' | 'calendar';
+type ContentView = 'weather' | 'news' | 'jobs' | 'calendar' | 'finance';
 
-const VIEWS: ContentView[] = ['weather', 'news', 'jobs', 'calendar'];
+const VIEWS: ContentView[] = ['weather', 'news', 'jobs', 'calendar', 'finance'];
 
 const CITIES: Record<string, string> = {
   Seoul: '서울',
@@ -287,6 +288,20 @@ export default function Home() {
             <CalendarWidget calendarSources={calendarSources} />
           </div>
 
+          {/* Finance Widget (index 4) */}
+          <div
+            className={`absolute inset-0 ${isDragging ? '' : 'transition-all duration-500 ease-out'} ${
+              currentView === 'finance' ? 'pointer-events-auto' : 'pointer-events-none'
+            }`}
+            style={{
+              transform: getWidgetTransform('finance'),
+              opacity: getWidgetOpacity('finance'),
+              transformOrigin: 'center center',
+            }}
+          >
+            <FinanceWidget rotationSeconds={10} />
+          </div>
+
           {/* Vertical Page Indicator - Inside Widget */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-10">
             <div
@@ -307,6 +322,11 @@ export default function Home() {
             <div
               className={`w-2 rounded-full transition-all duration-300 ${
                 currentView === 'calendar' ? 'bg-purple-400 h-6' : 'bg-white/30 h-2'
+              }`}
+            />
+            <div
+              className={`w-2 rounded-full transition-all duration-300 ${
+                currentView === 'finance' ? 'bg-green-400 h-6' : 'bg-white/30 h-2'
               }`}
             />
           </div>
@@ -557,6 +577,7 @@ export default function Home() {
               </h3>
               <div className="space-y-2 text-sm text-gray-300">
                 <p>버전: 2.0.0</p>
+                <p>Inspired by ishikoken28 with Panorama</p>
                 <p>
                   <a
                     href="https://github.com/starkid/panorama-korea"

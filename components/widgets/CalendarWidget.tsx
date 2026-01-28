@@ -157,111 +157,138 @@ export function CalendarWidget({
 
   const currentEvent = events[currentIndex];
 
+  const today = new Date();
+  const dayOfMonth = today.getDate();
+  const dayOfWeek = today.toLocaleDateString('ko-KR', { weekday: 'long' });
+  const month = today.toLocaleDateString('ko-KR', { month: 'long' });
+  const year = today.getFullYear();
+
   return (
     <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-purple-500/30 rounded-full flex items-center justify-center">
-            <span className="text-lg">📅</span>
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-white">오늘의 일정</h2>
-            <p className="text-xs text-gray-400">
-              {new Date().toLocaleDateString('ko-KR', {
-                month: 'long',
-                day: 'numeric',
-                weekday: 'short'
-              })}
-            </p>
-          </div>
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-8 h-8 bg-purple-500/30 rounded-full flex items-center justify-center">
+          <span className="text-lg">📅</span>
         </div>
+        <h2 className="text-lg font-semibold text-white">오늘의 일정</h2>
         {events.length > 1 && (
-          <div className="text-sm text-gray-400">
+          <div className="ml-auto text-sm text-gray-400">
             {currentIndex + 1} / {events.length}
           </div>
         )}
       </div>
 
-      {/* Event Content */}
-      <div className="flex-1 flex flex-col justify-center">
-        {/* Event Title with Color Bar */}
-        <div className="flex items-start gap-3 mb-4">
-          {currentEvent.color && (
-            <div
-              className="w-2 h-16 rounded-full flex-shrink-0"
-              style={{ backgroundColor: currentEvent.color }}
-            />
-          )}
-          <div className="flex-1">
-            <h3
-              key={`title-${currentIndex}`}
-              className="text-5xl font-bold text-white line-clamp-2 animate-[slideUp_0.5s_ease-out]"
-            >
-              {currentEvent.title}
-            </h3>
-            {currentEvent.sourceName && (
-              <p className="text-sm text-gray-400 mt-2">
-                {currentEvent.sourceName}
-              </p>
-            )}
+      {/* Event Content - 2 Column Layout */}
+      <div className="flex-1 flex gap-6">
+        {/* Left: Calendar Card */}
+        <div className="flex flex-col items-center justify-center">
+          {/* Calendar Date Card */}
+          <div className="relative bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 p-6 min-w-[200px]">
+            {/* Calendar Header */}
+            <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-t-3xl py-3 px-4">
+              <div className="text-white text-center font-semibold">
+                {year}년 {month}
+              </div>
+            </div>
+
+            {/* Date Display */}
+            <div className="mt-10 flex flex-col items-center">
+              <div className="text-[100px] font-bold text-white leading-none mb-2">
+                {dayOfMonth}
+              </div>
+              <div className="text-2xl font-semibold text-purple-200">
+                {dayOfWeek}
+              </div>
+            </div>
+
+            {/* Calendar Binding Holes Effect */}
+            <div className="absolute top-14 left-0 right-0 flex justify-around px-8">
+              <div className="w-3 h-3 rounded-full bg-black/20" />
+              <div className="w-3 h-3 rounded-full bg-black/20" />
+            </div>
           </div>
         </div>
 
-        {/* Event Time */}
-        {!currentEvent.allDay && (
-          <div className="flex items-center gap-2 text-2xl text-purple-300 mb-3">
-            <span>🕐</span>
-            <span>
-              {formatTime(currentEvent.start)}
-              {currentEvent.start.getTime() !== currentEvent.end.getTime() &&
-                ` - ${formatTime(currentEvent.end)}`
-              }
-            </span>
+        {/* Right: Event Details */}
+        <div className="flex-1 flex flex-col justify-center border-l border-white/10 pl-6">
+          {/* Event Title with Color Bar */}
+          <div className="flex items-start gap-3 mb-4">
+            {currentEvent.color && (
+              <div
+                className="w-2 h-16 rounded-full flex-shrink-0"
+                style={{ backgroundColor: currentEvent.color }}
+              />
+            )}
+            <div className="flex-1">
+              <h3
+                key={`title-${currentIndex}`}
+                className="text-4xl font-bold text-white line-clamp-2 animate-[slideUp_0.5s_ease-out]"
+              >
+                {currentEvent.title}
+              </h3>
+              {currentEvent.sourceName && (
+                <p className="text-sm text-gray-400 mt-2">
+                  {currentEvent.sourceName}
+                </p>
+              )}
+            </div>
           </div>
-        )}
 
-        {/* Event Description */}
-        {currentEvent.description && (
-          <p
-            key={`desc-${currentIndex}`}
-            className="text-xl text-gray-300 line-clamp-3 animate-[slideUp_0.5s_ease-out] delay-100"
-          >
-            {currentEvent.description}
-          </p>
-        )}
-
-        {/* Next Event */}
-        {nextEvent && (
-          <div className="mt-6 pt-4 border-t border-white/10">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-gray-400">다음 예정</span>
-              <span className="text-sm text-gray-500">
-                {nextEvent.start.toLocaleDateString('ko-KR', {
-                  month: 'long',
-                  day: 'numeric',
-                  weekday: 'short'
-                })}
+          {/* Event Time */}
+          {!currentEvent.allDay && (
+            <div className="flex items-center gap-2 text-xl text-purple-300 mb-3">
+              <span>🕐</span>
+              <span>
+                {formatTime(currentEvent.start)}
+                {currentEvent.start.getTime() !== currentEvent.end.getTime() &&
+                  ` - ${formatTime(currentEvent.end)}`
+                }
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              {nextEvent.color && (
-                <div
-                  className="w-1 h-6 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: nextEvent.color }}
-                />
+          )}
+
+          {/* Event Description */}
+          {currentEvent.description && (
+            <p
+              key={`desc-${currentIndex}`}
+              className="text-lg text-gray-300 line-clamp-2 animate-[slideUp_0.5s_ease-out] delay-100"
+            >
+              {currentEvent.description}
+            </p>
+          )}
+
+          {/* Next Event */}
+          {nextEvent && (
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-sm text-gray-400">다음 예정</span>
+                <span className="text-sm text-gray-500">
+                  {nextEvent.start.toLocaleDateString('ko-KR', {
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'short'
+                  })}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {nextEvent.color && (
+                  <div
+                    className="w-1 h-6 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: nextEvent.color }}
+                  />
+                )}
+                <p className="text-base text-gray-300 font-semibold line-clamp-1 flex-1">
+                  {nextEvent.title}
+                </p>
+              </div>
+              {nextEvent.sourceName && (
+                <p className="text-xs text-gray-500 mt-1 ml-3">
+                  {nextEvent.sourceName}
+                </p>
               )}
-              <p className="text-lg text-gray-300 font-semibold line-clamp-1 flex-1">
-                {nextEvent.title}
-              </p>
             </div>
-            {nextEvent.sourceName && (
-              <p className="text-xs text-gray-500 mt-1 ml-3">
-                {nextEvent.sourceName}
-              </p>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Progress Dots */}
