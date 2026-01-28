@@ -31,75 +31,21 @@ export async function GET(request: Request) {
   }
 
   try {
-    const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type') || 'all'; // stock, crypto, currency, all
-
     const markets: FinanceItem[] = [];
 
-    // 주요 한국 주식
-    if (type === 'stock' || type === 'all') {
-      const stockSymbols = ['005930.KS', 'TSLA', 'AAPL', 'GOOGL']; // 삼성전자, 테슬라, 애플, 구글
+    // 필요한 5개 항목만 정의 (API 호출 최소화)
+    const symbols = [
+      { query: 'KOSPI', name: '코스피', type: 'stock' as const },
+      { query: 'KOSDAQ', name: '코스닥', type: 'stock' as const },
+      { query: 'USD-KRW', name: '원/달러', type: 'currency' as const },
+      { query: '.INX', name: 'S&P 500', type: 'stock' as const },
+      { query: '.IXIC', name: '나스닥', type: 'stock' as const },
+    ];
 
-      for (const symbol of stockSymbols) {
-        try {
-          const url = `https://serpapi.com/search.json?engine=google_finance&q=${symbol}&api_key=${apiKey}`;
-          const response = await fetch(url);
-
-          if (response.ok) {
-            const data = await response.json();
-            const summary = data.summary;
-
-            if (summary) {
-              markets.push({
-                symbol: symbol,
-                name: summary.title || symbol,
-                price: summary.price || '0',
-                change: summary.price_movement?.movement || '0',
-                changePercent: summary.price_movement?.percentage || '0',
-                type: 'stock',
-              });
-            }
-          }
-        } catch (error) {
-          console.error(`Stock ${symbol} fetch error:`, error);
-        }
-      }
-    }
-
-    // 주요 암호화폐
-    if (type === 'crypto' || type === 'all') {
-      const cryptoSymbols = ['BTC', 'ETH'];
-
-      for (const symbol of cryptoSymbols) {
-        try {
-          const url = `https://serpapi.com/search.json?engine=google_finance&q=${symbol}-USD&api_key=${apiKey}`;
-          const response = await fetch(url);
-
-          if (response.ok) {
-            const data = await response.json();
-            const summary = data.summary;
-
-            if (summary) {
-              markets.push({
-                symbol: symbol,
-                name: summary.title || symbol,
-                price: summary.price || '0',
-                change: summary.price_movement?.movement || '0',
-                changePercent: summary.price_movement?.percentage || '0',
-                type: 'crypto',
-              });
-            }
-          }
-        } catch (error) {
-          console.error(`Crypto ${symbol} fetch error:`, error);
-        }
-      }
-    }
-
-    // 환율
-    if (type === 'currency' || type === 'all') {
+    // 5개 항목을 순차적으로 가져오기
+    for (const { query, name, type } of symbols) {
       try {
-        const url = `https://serpapi.com/search.json?engine=google_finance&q=USD-KRW&api_key=${apiKey}`;
+        const url = `https://serpapi.com/search.json?engine=google_finance&q=${query}&api_key=${apiKey}`;
         const response = await fetch(url);
 
         if (response.ok) {
@@ -108,17 +54,17 @@ export async function GET(request: Request) {
 
           if (summary) {
             markets.push({
-              symbol: 'USD/KRW',
-              name: '달러/원',
+              symbol: query === 'USD-KRW' ? 'USD/KRW' : query,
+              name: name,
               price: summary.price || '0',
               change: summary.price_movement?.movement || '0',
               changePercent: summary.price_movement?.percentage || '0',
-              type: 'currency',
+              type: type,
             });
           }
         }
       } catch (error) {
-        console.error('Currency fetch error:', error);
+        console.error(`${name} fetch error:`, error);
       }
     }
 
@@ -150,36 +96,44 @@ export async function GET(request: Request) {
 function getMockMarkets(): FinanceItem[] {
   return [
     {
-      symbol: '005930.KS',
-      name: '삼성전자',
-      price: '71,500',
-      change: '+500',
-      changePercent: '+0.70%',
+      symbol: 'KOSPI',
+      name: '코스피',
+      price: '2,580.50',
+      change: '+15.30',
+      changePercent: '+0.60%',
       type: 'stock',
     },
     {
-      symbol: 'TSLA',
-      name: 'Tesla Inc',
-      price: '$245.32',
-      change: '+5.12',
-      changePercent: '+2.13%',
+      symbol: 'KOSDAQ',
+      name: '코스닥',
+      price: '850.20',
+      change: '+8.50',
+      changePercent: '+1.01%',
       type: 'stock',
-    },
-    {
-      symbol: 'BTC',
-      name: 'Bitcoin',
-      price: '$43,250',
-      change: '+1,250',
-      changePercent: '+2.98%',
-      type: 'crypto',
     },
     {
       symbol: 'USD/KRW',
-      name: '달러/원',
+      name: '원/달러',
       price: '1,325.50',
       change: '+5.50',
       changePercent: '+0.42%',
       type: 'currency',
+    },
+    {
+      symbol: '.INX',
+      name: 'S&P 500',
+      price: '4,850.20',
+      change: '+25.30',
+      changePercent: '+0.52%',
+      type: 'stock',
+    },
+    {
+      symbol: '.IXIC',
+      name: '나스닥',
+      price: '15,250.80',
+      change: '+95.60',
+      changePercent: '+0.63%',
+      type: 'stock',
     },
   ];
 }

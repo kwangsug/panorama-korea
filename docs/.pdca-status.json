@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-01-28T06:10:45.120Z",
+  "lastUpdated": "2026-01-28T06:41:46.539Z",
   "activeFeatures": [
     "panorama-korea",
     "widgets",
@@ -10,7 +10,7 @@
     "calendar",
     "finance"
   ],
-  "primaryFeature": "widgets",
+  "primaryFeature": "finance",
   "features": {
     "panorama-korea": {
       "phase": "do",
@@ -21,7 +21,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-01-28T00:44:12.264Z",
-        "lastUpdated": "2026-01-28T06:02:26.305Z"
+        "lastUpdated": "2026-01-28T06:29:13.904Z"
       }
     },
     "widgets": {
@@ -33,7 +33,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-01-28T00:46:45.282Z",
-        "lastUpdated": "2026-01-28T06:10:30.247Z"
+        "lastUpdated": "2026-01-28T06:38:57.887Z"
       }
     },
     "jobs": {
@@ -69,7 +69,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-01-28T05:08:57.542Z",
-        "lastUpdated": "2026-01-28T05:08:57.542Z"
+        "lastUpdated": "2026-01-28T06:39:40.950Z"
       }
     },
     "calendar": {
@@ -81,7 +81,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-01-28T05:14:05.978Z",
-        "lastUpdated": "2026-01-28T05:44:04.303Z"
+        "lastUpdated": "2026-01-28T06:25:33.969Z"
       }
     },
     "finance": {
@@ -93,7 +93,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-01-28T05:57:50.796Z",
-        "lastUpdated": "2026-01-28T05:57:50.796Z"
+        "lastUpdated": "2026-01-28T06:41:46.538Z"
       }
     }
   },
@@ -105,177 +105,9 @@
   "session": {
     "startedAt": "2026-01-28T00:37:09.466Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-01-28T06:10:45.120Z"
+    "lastActivity": "2026-01-28T06:41:46.539Z"
   },
   "history": [
-    {
-      "timestamp": "2026-01-28T02:27:52.981Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:27:59.863Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:28:39.985Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:28:45.360Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:28:53.477Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:29:01.465Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:29:07.838Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:31:50.139Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:32:21.462Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:32:27.868Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:32:38.231Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:32:48.211Z",
-      "feature": "jobs",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:32:58.692Z",
-      "feature": "jobs",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:33:17.862Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:33:28.532Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:35:52.923Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:36:04.059Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:36:37.460Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:36:45.183Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:36:51.604Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:36:58.502Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:37:14.458Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:37:22.551Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T02:38:52.435Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T05:08:57.542Z",
-      "feature": "news",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T05:09:25.660Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T05:09:48.668Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T05:10:19.524Z",
-      "feature": "panorama-korea",
-      "phase": "do",
-      "action": "updated"
-    },
     {
       "timestamp": "2026-01-28T05:10:30.313Z",
       "feature": "panorama-korea",
@@ -705,6 +537,174 @@
     {
       "timestamp": "2026-01-28T06:10:30.247Z",
       "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:16:58.595Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:17:22.230Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:20:17.485Z",
+      "feature": "news",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:20:25.901Z",
+      "feature": "news",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:20:33.030Z",
+      "feature": "news",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:23:08.113Z",
+      "feature": "news",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:23:19.583Z",
+      "feature": "news",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:23:39.818Z",
+      "feature": "news",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:24:05.793Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:25:33.969Z",
+      "feature": "calendar",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:25:45.651Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:26:16.553Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:26:28.949Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:26:51.274Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:28:42.030Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:28:55.864Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:29:13.904Z",
+      "feature": "panorama-korea",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:29:43.576Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:31:30.050Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:32:51.080Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:33:08.300Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:33:18.817Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:38:36.775Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:38:57.887Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:39:22.389Z",
+      "feature": "news",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:39:40.950Z",
+      "feature": "news",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:41:35.847Z",
+      "feature": "finance",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:41:46.538Z",
+      "feature": "finance",
       "phase": "do",
       "action": "updated"
     }

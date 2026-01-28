@@ -106,7 +106,7 @@ async function handleNaverNews(source: string, city: string) {
           publishedAt: new Date(item.pubDate),
         };
       })
-      .filter((item) => !isMeaninglessTitle(item.title));
+      .filter((item: NewsItem) => !isMeaninglessTitle(item.title));
 
     return NextResponse.json(
       { news, source: 'naver' },
@@ -179,7 +179,7 @@ async function handleGoogleNews(city: string) {
           publishedAt: item.date ? new Date(item.date) : new Date(),
         };
       })
-      .filter((item) => !isMeaninglessTitle(item.title));
+      .filter((item: NewsItem) => !isMeaninglessTitle(item.title));
 
     return NextResponse.json(
       { news, source: 'google' },

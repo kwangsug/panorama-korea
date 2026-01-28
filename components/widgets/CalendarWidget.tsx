@@ -167,8 +167,6 @@ export function CalendarWidget({
   const today = new Date();
   const dayOfMonth = today.getDate();
   const dayOfWeek = today.toLocaleDateString('ko-KR', { weekday: 'long' });
-  const month = today.toLocaleDateString('ko-KR', { month: 'long' });
-  const year = today.getFullYear();
 
   return (
     <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col">
@@ -185,25 +183,20 @@ export function CalendarWidget({
         )}
       </div>
 
-      {/* Event Content - Single Column Layout */}
-      <div className="flex-1 flex flex-col justify-center">
-        {/* Date and Day Display - Large */}
-        <div className="flex items-baseline gap-3 md:gap-4 mb-6 md:mb-8">
+      {/* Event Content - 2 Column Layout: Date Left, Content Right */}
+      <div className="flex-1 flex gap-6">
+        {/* Left: Date and Day */}
+        <div className="flex flex-col items-center justify-center">
           <div className="text-[8vw] md:text-[6vw] font-bold text-white leading-none">
             {dayOfMonth}
           </div>
-          <div className="flex flex-col">
-            <div className="text-[2.5vw] md:text-[2vw] font-semibold text-purple-200 mb-1 md:mb-2">
-              {dayOfWeek}
-            </div>
-            <div className="text-[1.3vw] md:text-[1vw] text-gray-400">
-              {year}년 {month}
-            </div>
+          <div className="text-[2.5vw] md:text-[2vw] font-semibold text-purple-200 mt-2">
+            {dayOfWeek}
           </div>
         </div>
 
-        {/* Event Details */}
-        <div className="border-t border-white/10 pt-6">
+        {/* Right: Event Details */}
+        <div className="flex-1 flex flex-col justify-center border-l border-white/10 pl-6">
           {/* Event Title with Color Bar */}
           <div className="flex items-start gap-3 mb-4">
             {currentEvent.color && (
@@ -215,12 +208,12 @@ export function CalendarWidget({
             <div className="flex-1">
               <h3
                 key={`title-${currentIndex}`}
-                className="text-4xl font-bold text-white line-clamp-2 animate-[slideUp_0.5s_ease-out]"
+                className="text-[3vw] md:text-[2.5vw] font-bold text-white line-clamp-2 animate-[slideUp_0.5s_ease-out]"
               >
                 {currentEvent.title}
               </h3>
               {currentEvent.sourceName && (
-                <p className="text-sm text-gray-400 mt-2">
+                <p className="text-[1vw] md:text-[0.8vw] text-gray-400 mt-2">
                   {currentEvent.sourceName}
                 </p>
               )}
@@ -229,7 +222,7 @@ export function CalendarWidget({
 
           {/* Event Time */}
           {!currentEvent.allDay && (
-            <div className="flex items-center gap-2 text-xl text-purple-300 mb-3">
+            <div className="flex items-center gap-2 text-[1.5vw] md:text-[1.2vw] text-purple-300 mb-3">
               <span>🕐</span>
               <span>
                 {formatTime(currentEvent.start)}
@@ -244,7 +237,7 @@ export function CalendarWidget({
           {currentEvent.description && (
             <p
               key={`desc-${currentIndex}`}
-              className="text-lg text-gray-300 line-clamp-2 animate-[slideUp_0.5s_ease-out] delay-100"
+              className="text-[1.3vw] md:text-[1vw] text-gray-300 line-clamp-2 animate-[slideUp_0.5s_ease-out] delay-100"
             >
               {currentEvent.description}
             </p>
@@ -254,8 +247,8 @@ export function CalendarWidget({
           {nextEvent && (
             <div className="mt-4 pt-4 border-t border-white/10">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm text-gray-400">다음 예정</span>
-                <span className="text-sm text-gray-500">
+                <span className="text-[1vw] md:text-[0.8vw] text-gray-400">다음 예정</span>
+                <span className="text-[1vw] md:text-[0.8vw] text-gray-500">
                   {nextEvent.start.toLocaleDateString('ko-KR', {
                     month: 'long',
                     day: 'numeric',
@@ -270,12 +263,12 @@ export function CalendarWidget({
                     style={{ backgroundColor: nextEvent.color }}
                   />
                 )}
-                <p className="text-base text-gray-300 font-semibold line-clamp-1 flex-1">
+                <p className="text-[1.2vw] md:text-[1vw] text-gray-300 font-semibold line-clamp-1 flex-1">
                   {nextEvent.title}
                 </p>
               </div>
               {nextEvent.sourceName && (
-                <p className="text-xs text-gray-500 mt-1 ml-3">
+                <p className="text-[0.8vw] md:text-[0.6vw] text-gray-500 mt-1 ml-3">
                   {nextEvent.sourceName}
                 </p>
               )}
