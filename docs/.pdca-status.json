@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-01-28T06:57:24.414Z",
+  "lastUpdated": "2026-01-28T08:57:02.347Z",
   "activeFeatures": [
     "panorama-korea",
     "widgets",
@@ -8,9 +8,11 @@
     "api",
     "news",
     "calendar",
-    "finance"
+    "finance",
+    "incruit-recruitment-display",
+    "panorama-incruit"
   ],
-  "primaryFeature": "widgets",
+  "primaryFeature": "panorama-incruit",
   "features": {
     "panorama-korea": {
       "phase": "do",
@@ -33,7 +35,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-01-28T00:46:45.282Z",
-        "lastUpdated": "2026-01-28T06:57:24.414Z"
+        "lastUpdated": "2026-01-28T08:00:10.199Z"
       }
     },
     "jobs": {
@@ -95,6 +97,33 @@
         "started": "2026-01-28T05:57:50.796Z",
         "lastUpdated": "2026-01-28T06:41:46.538Z"
       }
+    },
+    "incruit-recruitment-display": {
+      "phase": "design",
+      "phaseNumber": 2,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {
+        "plan": "docs/01-plan/features/incruit-recruitment-display.plan.md",
+        "design": "docs/02-design/features/incruit-recruitment-display.design.md"
+      },
+      "timestamps": {
+        "started": "2026-01-28T08:30:00.000Z",
+        "lastUpdated": "2026-01-28T08:45:00.000Z"
+      }
+    },
+    "panorama-incruit": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-01-28T08:52:05.249Z",
+        "lastUpdated": "2026-01-28T08:52:05.249Z"
+      }
     }
   },
   "pipeline": {
@@ -105,39 +134,9 @@
   "session": {
     "startedAt": "2026-01-28T00:37:09.466Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-01-28T06:57:24.414Z"
+    "lastActivity": "2026-01-28T08:57:02.347Z"
   },
   "history": [
-    {
-      "timestamp": "2026-01-28T05:15:22.876Z",
-      "feature": "panorama-korea",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T05:15:35.280Z",
-      "feature": "panorama-korea",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T05:15:47.156Z",
-      "feature": "panorama-korea",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T05:16:01.847Z",
-      "feature": "panorama-korea",
-      "phase": "do",
-      "action": "updated"
-    },
-    {
-      "timestamp": "2026-01-28T05:16:38.311Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
     {
       "timestamp": "2026-01-28T05:17:19.312Z",
       "feature": "widgets",
@@ -705,6 +704,36 @@
     {
       "timestamp": "2026-01-28T06:57:24.414Z",
       "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T07:59:15.418Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T07:59:26.768Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T07:59:36.025Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T08:00:10.199Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T08:52:05.249Z",
+      "feature": "panorama-incruit",
       "phase": "do",
       "action": "updated"
     }

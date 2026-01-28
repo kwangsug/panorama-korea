@@ -221,9 +221,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden flex items-center justify-center">
-      {/* Dashboard Container - 32:9 Aspect Ratio (1920x540) */}
-      <div className="w-full max-w-[1920px] aspect-[32/9] p-4 md:p-6 flex gap-4 md:gap-5">
+    <div className="h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden flex items-center justify-center">
+      {/* Dashboard Container - Full Screen */}
+      <div className="w-full h-full max-w-[1920px] p-4 md:p-6 flex gap-4 md:gap-5">
         {/* Clock Widget - 왼쪽 (4 비율) */}
         <div className="w-[40%] flex-shrink-0 h-full">
           <ClockWidget />
