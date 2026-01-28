@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 
-// Node.js 런타임 사용을 위해 edge 설정 제거
-
 interface JobItem {
   title: string;
   company: string;
@@ -47,16 +45,15 @@ export async function GET(request: Request) {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; PanoramaKorea/1.0)',
       },
-      next: { revalidate: 60 }, // 1분 캐시 설정
+      cache: 'no-store', // 캐시 비활성화 (실시간 데이터 로드)
     });
 
     if (!response.ok) {
       throw new Error('RSS fetch failed');
     }
 
-    const buffer = await response.arrayBuffer();
-    const decoder = new TextDecoder('euc-kr');
-    const xml = decoder.decode(buffer);
+    // UTF-8로 직접 읽기 시도
+    const xml = await response.text();
     const { jobs, feedTitle } = parseRSS(xml);
 
     return NextResponse.json({ jobs, feedTitle });
@@ -127,12 +124,26 @@ function extractFromDesc(desc: string, field: string): string {
 }
 
 function cleanText(text: string): string {
-  return text
-    .replace(/<[^>]*>/g, '')
+  // 먼저 HTML 태그 제거
+  let cleaned = text.replace(/<[^>]*>/g, '');
+
+  // HTML 엔티티 디코딩
+  cleaned = cleaned
+    .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
     .replace(/&quot;/g, '"')
+    .replace(/&#34;/g, '"')
+    .replace(/&apos;/g, "'")
     .replace(/&#39;/g, "'")
-    .trim();
+    .replace(/&#x27;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#160;/g, ' ')
+    .replace(/&lsquo;/g, '\u2018')
+    .replace(/&rsquo;/g, '\u2019')
+    .replace(/&ldquo;/g, '\u201C')
+    .replace(/&rdquo;/g, '\u201D');
+
+  // 추가적인 공백 정리
+  return cleaned.replace(/\s+/g, ' ').trim();
 }

@@ -18,13 +18,16 @@ interface JobWidgetProps {
 // 제목에서 기업명 패턴 제거
 function cleanJobTitle(title: string, company: string): string {
   let cleanTitle = title;
+  // 정규식 특수문자 이스케이프
+  const escapedCompany = company.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
   const companyPatterns = [
-    new RegExp(`^\\[${company}\\]\\s*`, 'i'),
-    new RegExp(`^\\(${company}\\)\\s*`, 'i'),
-    new RegExp(`^${company}\\s*[-:]\\s*`, 'i'),
-    new RegExp(`^${company}\\s+`, 'i'),
-    new RegExp(`\\[${company}\\]`, 'gi'),
-    new RegExp(`\\(${company}\\)`, 'gi'),
+    new RegExp(`^\\[${escapedCompany}\\]\\s*`, 'i'),
+    new RegExp(`^\\(${escapedCompany}\\)\\s*`, 'i'),
+    new RegExp(`^${escapedCompany}\\s*[-:]\\s*`, 'i'),
+    new RegExp(`^${escapedCompany}\\s+`, 'i'),
+    new RegExp(`\\[${escapedCompany}\\]`, 'gi'),
+    new RegExp(`\\(${escapedCompany}\\)`, 'gi'),
   ];
   for (const pattern of companyPatterns) {
     cleanTitle = cleanTitle.replace(pattern, '').trim();

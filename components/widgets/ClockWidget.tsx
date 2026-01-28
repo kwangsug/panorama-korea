@@ -106,17 +106,6 @@ function Separator() {
   );
 }
 
-// HTML 엔티티 디코딩
-function decodeHtmlEntities(text: string): string {
-  return text
-    .replace(/&quot;/g, '"')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&#39;/g, "'")
-    .replace(/&apos;/g, "'");
-}
-
 // 제목에서 기업명 패턴 제거
 function cleanJobTitle(title: string, company: string): string {
   let cleanTitle = title;
@@ -217,7 +206,7 @@ export function ClockWidget() {
         const newsItems: TickerItem[] = [];
         if (newsData.news) {
           newsData.news.slice(0, 10).forEach((article: { title: string }) => {
-            newsItems.push({ type: 'news', title: decodeHtmlEntities(article.title), source: '뉴스' });
+            newsItems.push({ type: 'news', title: article.title, source: '뉴스' });
           });
         }
 
@@ -225,11 +214,9 @@ export function ClockWidget() {
         const jobItems: TickerItem[] = [];
         if (jobsData.jobs) {
           jobsData.jobs.slice(0, 10).forEach((job: { title: string; company: string }) => {
-            const decodedTitle = decodeHtmlEntities(job.title);
-            const decodedCompany = decodeHtmlEntities(job.company);
-            const cleanedTitle = cleanJobTitle(decodedTitle, decodedCompany);
+            const cleanedTitle = cleanJobTitle(job.title, job.company);
             // 기업명 + 제목 형태로 표시
-            jobItems.push({ type: 'job', title: `${decodedCompany} - ${cleanedTitle}`, source: '채용' });
+            jobItems.push({ type: 'job', title: `${job.company} - ${cleanedTitle}`, source: '채용' });
           });
         }
 

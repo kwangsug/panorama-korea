@@ -5,11 +5,12 @@ import { ClockWidget } from '@/components/widgets/ClockWidget';
 import { WeatherWidget } from '@/components/widgets/WeatherWidget';
 import { NewsWidget } from '@/components/widgets/NewsWidget';
 import { JobWidget } from '@/components/widgets/JobWidget';
+import { CalendarWidget } from '@/components/widgets/CalendarWidget';
 import { MAJOR_CITIES, type CityName } from '@/lib/api/weather';
 
-type ContentView = 'weather' | 'news' | 'jobs';
+type ContentView = 'weather' | 'news' | 'jobs' | 'calendar';
 
-const VIEWS: ContentView[] = ['weather', 'news', 'jobs'];
+const VIEWS: ContentView[] = ['weather', 'news', 'jobs', 'calendar'];
 
 const CITIES: Record<string, string> = {
   Seoul: '서울',
@@ -42,10 +43,25 @@ export default function Home() {
 
   // Settings state
   const [selectedCity, setSelectedCity] = useState<string>('Seoul');
-  const [newsSource, setNewsSource] = useState<'naver' | 'yonhap'>('naver');
+  const [newsSource, setNewsSource] = useState<'naver' | 'yonhap' | 'google'>('naver');
   const [autoSwitchSeconds, setAutoSwitchSeconds] = useState(30);
   const [newsRotationSeconds, setNewsRotationSeconds] = useState(15);
   const [jobRotationSeconds, setJobRotationSeconds] = useState(10);
+  const [calendarSources, setCalendarSources] = useState<Array<{
+    id: string;
+    url: string;
+    color: string;
+    enabled: boolean;
+    name: string;
+  }>>([
+    {
+      id: '1',
+      url: 'https://calendar.google.com/calendar/ical/ko.south_korea%23holiday%40group.v.calendar.google.com/public/basic.ics',
+      color: '#a78bfa', // 보라
+      enabled: true,
+      name: '한국 공휴일'
+    }
+  ]);
 
   // 설정 로드
   useEffect(() => {
@@ -58,6 +74,7 @@ export default function Home() {
         if (settings.autoSwitchSeconds) setAutoSwitchSeconds(settings.autoSwitchSeconds);
         if (settings.newsRotationSeconds) setNewsRotationSeconds(settings.newsRotationSeconds);
         if (settings.jobRotationSeconds) setJobRotationSeconds(settings.jobRotationSeconds);
+        if (settings.calendarSources) setCalendarSources(settings.calendarSources);
       } catch (e) {
         console.error('설정 로드 실패:', e);
       }
@@ -122,8 +139,8 @@ export default function Home() {
     const diffY = touchStart.y - e.clientY;
     const screenWidth = window.innerWidth;
 
-    // 오른쪽 가장자리에서 왼쪽으로 스와이프 → 설정 열기
-    if (touchStart.x > screenWidth - 100 && diffX > 30) {
+    // 왼쪽 가장자리에서 오른쪽으로 스와이프 → 설정 열기
+    if (touchStart.x < 100 && diffX < -30) {
       setIsDragging(false);
       setDragOffset(0);
       setSwipeAxis(null);
@@ -131,8 +148,8 @@ export default function Home() {
       return;
     }
 
-    // 설정이 열린 상태에서 오른쪽으로 스와이프 → 설정 닫기
-    if (settingsOpen && diffX < -30) {
+    // 설정이 열린 상태에서 왼쪽으로 스와이프 → 설정 닫기
+    if (settingsOpen && diffX > 30) {
       setIsDragging(false);
       setDragOffset(0);
       setSwipeAxis(null);
@@ -200,14 +217,14 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden flex items-center justify-center">
       {/* Dashboard Container - 32:9 Aspect Ratio (1920x540) */}
       <div className="w-full max-w-[1920px] aspect-[32/9] p-4 md:p-6 flex gap-4 md:gap-5">
-        {/* Clock Widget - 왼쪽 (반응형) */}
-        <div className="w-[280px] md:w-[360px] lg:w-[480px] flex-shrink-0 h-full">
+        {/* Clock Widget - 왼쪽 (4 비율) */}
+        <div className="w-[40%] flex-shrink-0 h-full">
           <ClockWidget />
         </div>
 
-        {/* Content Area - 위젯 영역에서만 스와이프 반응 */}
+        {/* Content Area - 오른쪽 (6 비율) */}
         <div
-          className="flex-1 h-full relative overflow-hidden"
+          className="w-[60%] flex-shrink-0 h-full relative overflow-hidden"
           style={{ perspective: '1200px' }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -256,6 +273,20 @@ export default function Home() {
             <JobWidget rotationSeconds={jobRotationSeconds} />
           </div>
 
+          {/* Calendar Widget (index 3) */}
+          <div
+            className={`absolute inset-0 ${isDragging ? '' : 'transition-all duration-500 ease-out'} ${
+              currentView === 'calendar' ? 'pointer-events-auto' : 'pointer-events-none'
+            }`}
+            style={{
+              transform: getWidgetTransform('calendar'),
+              opacity: getWidgetOpacity('calendar'),
+              transformOrigin: 'center center',
+            }}
+          >
+            <CalendarWidget calendarSources={calendarSources} />
+          </div>
+
           {/* Vertical Page Indicator - Inside Widget */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-10">
             <div
@@ -273,14 +304,19 @@ export default function Home() {
                 currentView === 'jobs' ? 'bg-orange-400 h-6' : 'bg-white/30 h-2'
               }`}
             />
+            <div
+              className={`w-2 rounded-full transition-all duration-300 ${
+                currentView === 'calendar' ? 'bg-purple-400 h-6' : 'bg-white/30 h-2'
+              }`}
+            />
           </div>
         </div>
       </div>
 
-      {/* Settings Sidebar - Right Side */}
+      {/* Settings Sidebar - Left Side */}
       <div
-        className={`fixed inset-y-0 right-0 w-80 bg-black/80 backdrop-blur-xl border-l border-white/10 transform transition-transform duration-300 ease-in-out z-50 ${
-          settingsOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed inset-y-0 left-0 w-80 bg-black/80 backdrop-blur-xl border-r border-white/10 transform transition-transform duration-300 ease-in-out z-50 ${
+          settingsOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="p-6 h-full overflow-y-auto">
@@ -325,7 +361,7 @@ export default function Home() {
               <select
                 value={newsSource}
                 onChange={(e) => {
-                  const value = e.target.value as 'naver' | 'yonhap';
+                  const value = e.target.value as 'naver' | 'yonhap' | 'google';
                   setNewsSource(value);
                   saveSettings({ newsSource: value });
                 }}
@@ -333,9 +369,110 @@ export default function Home() {
               >
                 <option value="naver" className="bg-slate-800">네이버 뉴스</option>
                 <option value="yonhap" className="bg-slate-800">연합뉴스</option>
+                <option value="google" className="bg-slate-800">구글 뉴스 (지역 포함)</option>
               </select>
               <p className="mt-2 text-xs text-gray-400">
-                뉴스 소스 변경 시 새로고침 필요
+                구글 뉴스는 선택한 지역 뉴스를 자동으로 포함합니다
+              </p>
+            </div>
+
+            {/* 캘린더 소스 관리 */}
+            <div className="bg-white/10 rounded-lg p-4">
+              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                <span>📅</span> 캘린더 소스
+              </h3>
+              <div className="space-y-3">
+                {calendarSources.map((source, index) => (
+                  <div key={source.id} className="bg-white/5 rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <input
+                        type="checkbox"
+                        checked={source.enabled}
+                        onChange={(e) => {
+                          const newSources = [...calendarSources];
+                          newSources[index].enabled = e.target.checked;
+                          setCalendarSources(newSources);
+                          saveSettings({ calendarSources: newSources });
+                        }}
+                        className="w-4 h-4"
+                      />
+                      <div
+                        className="w-6 h-6 rounded-full flex-shrink-0 border-2 border-white/20"
+                        style={{ backgroundColor: source.color }}
+                      />
+                      <span className="flex-1 text-sm text-gray-300 truncate">
+                        {source.name}
+                      </span>
+                      <input
+                        type="color"
+                        value={source.color}
+                        onChange={(e) => {
+                          const newSources = [...calendarSources];
+                          newSources[index].color = e.target.value;
+                          setCalendarSources(newSources);
+                          saveSettings({ calendarSources: newSources });
+                        }}
+                        className="w-6 h-6 rounded cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
+                        title="색상 변경"
+                      />
+                      {calendarSources.length > 1 && (
+                        <button
+                          onClick={() => {
+                            const newSources = calendarSources.filter((_, i) => i !== index);
+                            setCalendarSources(newSources);
+                            saveSettings({ calendarSources: newSources });
+                          }}
+                          className="text-red-400 hover:text-red-300 px-2"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                    <input
+                      type="text"
+                      value={source.url}
+                      onChange={(e) => {
+                        const newSources = [...calendarSources];
+                        newSources[index].url = e.target.value;
+                        // URL에서 이름 자동 추출 시도
+                        const urlName = e.target.value.includes('holidays') ? '한국 공휴일' : `캘린더 ${index + 1}`;
+                        newSources[index].name = urlName;
+                        setCalendarSources(newSources);
+                        saveSettings({ calendarSources: newSources });
+                      }}
+                      placeholder="iCal URL"
+                      className="w-full bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-xs"
+                    />
+                  </div>
+                ))}
+
+                {calendarSources.length < 5 && (
+                  <button
+                    onClick={() => {
+                      // 위젯과 어울리는 색상 팔레트 (보라, 분홍, 청록, 주황, 연두)
+                      const colors = ['#a78bfa', '#f472b6', '#06b6d4', '#fb923c', '#84cc16'];
+                      const usedColors = calendarSources.map(s => s.color);
+                      const availableColor = colors.find(c => !usedColors.includes(c)) || colors[calendarSources.length % colors.length];
+
+                      const newSource = {
+                        id: Date.now().toString(),
+                        url: '',
+                        color: availableColor,
+                        enabled: true,
+                        name: `캘린더 ${calendarSources.length + 1}`
+                      };
+                      const newSources = [...calendarSources, newSource];
+                      setCalendarSources(newSources);
+                      saveSettings({ calendarSources: newSources });
+                    }}
+                    className="w-full py-2 text-sm text-gray-300 hover:text-white border border-dashed border-white/20 hover:border-white/40 rounded-lg transition-colors"
+                  >
+                    + 캘린더 추가
+                  </button>
+                )}
+              </div>
+              <p className="mt-3 text-xs text-gray-400">
+                최대 5개까지 추가 가능합니다
               </p>
             </div>
 
@@ -419,10 +556,10 @@ export default function Home() {
                 <span>ℹ️</span> 정보
               </h3>
               <div className="space-y-2 text-sm text-gray-300">
-                <p>버전: 1.0.0</p>
+                <p>버전: 2.0.0</p>
                 <p>
                   <a
-                    href="https://github.com/user/panorama-korea"
+                    href="https://github.com/starkid/panorama-korea"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:underline"
@@ -445,21 +582,24 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Settings Hint - Right Edge */}
+      {/* Settings Hint - Left Edge */}
       {!settingsOpen && (
         <div
-          className="fixed right-0 top-0 bottom-0 w-16 z-30 flex items-center justify-end cursor-w-resize"
+          className="fixed left-0 top-0 bottom-0 w-16 z-30 flex items-center justify-start cursor-e-resize"
           onMouseEnter={() => setShowSettingsHint(true)}
           onMouseLeave={() => setShowSettingsHint(false)}
-          onClick={() => setSettingsOpen(true)}
+          onClick={() => {
+            setSettingsOpen(true);
+            setShowSettingsHint(false);
+          }}
         >
           <div
-            className={`flex items-center gap-1 px-2 py-4 bg-black/40 backdrop-blur-sm rounded-l-lg transition-all duration-300 ${
-              showSettingsHint ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+            className={`flex items-center gap-1 px-2 py-4 bg-black/40 backdrop-blur-sm rounded-r-lg transition-all duration-300 ${
+              showSettingsHint ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
             }`}
           >
-            <span className="text-white/80 text-lg">◀</span>
             <span className="text-white/80 text-xl">⚙️</span>
+            <span className="text-white/80 text-lg">▶</span>
           </div>
         </div>
       )}
