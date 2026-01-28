@@ -271,8 +271,8 @@ export function ClockWidget() {
     }
 
     loadTickerData();
-    // 1분마다 갱신
-    const interval = setInterval(loadTickerData, 60000);
+    // 5분마다 갱신 (API 캐시와 동기화)
+    const interval = setInterval(loadTickerData, 300000);
     return () => clearInterval(interval);
   }, [selectedCity]);
 
