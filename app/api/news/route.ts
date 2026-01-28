@@ -56,20 +56,39 @@ async function handleYonhapRSS() {
     // 연합뉴스 종합 RSS 피드
     const rssUrl = 'https://www.yonhapnews.co.kr/rss/news.xml';
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8초 타임아웃
+
     const response = await fetch(rssUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; PanoramaKorea/1.0)',
       },
+      signal: controller.signal,
     });
 
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
+      console.error(`연합뉴스 RSS HTTP 오류: ${response.status}`);
       throw new Error(`연합뉴스 RSS 오류: ${response.status}`);
     }
 
     const xmlText = await response.text();
 
+    if (!xmlText || xmlText.length === 0) {
+      console.error('연합뉴스 RSS 응답이 비어있음');
+      throw new Error('RSS 응답이 비어있음');
+    }
+
     // XML 파싱 (간단한 정규식 사용)
     const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
+
+    if (items.length === 0) {
+      console.error('연합뉴스 RSS에서 <item> 태그를 찾을 수 없음');
+      throw new Error('RSS에서 뉴스 항목을 찾을 수 없음');
+    }
+
+    console.log(`연합뉴스 RSS: ${items.length}개 항목 발견`);
 
     const news: NewsItem[] = items.slice(0, 20).map((item, index) => {
       const title = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1] ||
@@ -99,7 +118,21 @@ async function handleYonhapRSS() {
         source: '연합뉴스',
         publishedAt: pubDate ? new Date(pubDate) : new Date(),
       };
-    }).filter((item: NewsItem) => !isMeaninglessTitle(item.title));
+    }).filter((item: NewsItem) => item.title && !isMeaninglessTitle(item.title));
+
+    console.log(`연합뉴스 RSS: 필터링 후 ${news.length}개 뉴스 반환`);
+
+    if (news.length === 0) {
+      console.warn('연합뉴스 RSS: 유효한 뉴스 없음, 목업 데이터 반환');
+      return NextResponse.json(
+        { news: getMockNews(), source: 'mock' },
+        {
+          headers: {
+            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+          },
+        }
+      );
+    }
 
     return NextResponse.json(
       { news, source: 'yonhap' },
@@ -110,12 +143,18 @@ async function handleYonhapRSS() {
       }
     );
   } catch (error) {
-    console.error('연합뉴스 RSS 오류:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('연합뉴스 RSS 오류:', errorMessage);
 
     // 에러 시 목업 데이터 반환
     return NextResponse.json(
-      { news: getMockNews(), source: 'mock', error: String(error) },
-      { status: 200 }
+      { news: getMockNews(), source: 'mock', error: errorMessage },
+      {
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+        },
+      }
     );
   }
 }

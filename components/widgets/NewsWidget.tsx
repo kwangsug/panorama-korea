@@ -220,6 +220,7 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
         <div className="flex gap-1">
           <button
             onClick={() => {
+              setLoading(true);
               setNewsSource('naver');
               localStorage.setItem('panorama-settings', JSON.stringify({
                 ...JSON.parse(localStorage.getItem('panorama-settings') || '{}'),
@@ -236,6 +237,7 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
           </button>
           <button
             onClick={() => {
+              setLoading(true);
               setNewsSource('yonhap');
               localStorage.setItem('panorama-settings', JSON.stringify({
                 ...JSON.parse(localStorage.getItem('panorama-settings') || '{}'),
@@ -252,6 +254,7 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
           </button>
           <button
             onClick={() => {
+              setLoading(true);
               setNewsSource('google');
               localStorage.setItem('panorama-settings', JSON.stringify({
                 ...JSON.parse(localStorage.getItem('panorama-settings') || '{}'),
