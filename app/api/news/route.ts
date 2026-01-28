@@ -27,7 +27,7 @@ const CITY_NAME_MAP: Record<string, string> = {
 };
 
 /**
- * 뉴스 검색 API (네이버 + 구글)
+ * 뉴스 검색 API (네이버 + 연합 + 구글)
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -39,8 +39,85 @@ export async function GET(request: Request) {
     return handleGoogleNews(city);
   }
 
+  // 연합뉴스 RSS 요청 처리
+  if (source === 'yonhap') {
+    return handleYonhapRSS();
+  }
+
   // 네이버 뉴스 요청 처리
   return handleNaverNews(source, city);
+}
+
+/**
+ * 연합뉴스 RSS 피드
+ */
+async function handleYonhapRSS() {
+  try {
+    // 연합뉴스 종합 RSS 피드
+    const rssUrl = 'https://www.yonhapnews.co.kr/rss/news.xml';
+
+    const response = await fetch(rssUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; PanoramaKorea/1.0)',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`연합뉴스 RSS 오류: ${response.status}`);
+    }
+
+    const xmlText = await response.text();
+
+    // XML 파싱 (간단한 정규식 사용)
+    const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
+
+    const news: NewsItem[] = items.slice(0, 20).map((item, index) => {
+      const title = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1] ||
+                    item.match(/<title>(.*?)<\/title>/)?.[1] || '';
+      const description = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/)?.[1] ||
+                         item.match(/<description>(.*?)<\/description>/)?.[1] || '';
+      const link = item.match(/<link>(.*?)<\/link>/)?.[1] || '';
+      const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || '';
+
+      // 요약문에서 HTML 태그 제거 및 길이 제한
+      const cleanSummary = description
+        .replace(/<[^>]*>/g, '')
+        .replace(/&[^;]+;/g, (entity) => {
+          const entities: Record<string, string> = {
+            '&quot;': '"', '&apos;': "'", '&amp;': '&',
+            '&lt;': '<', '&gt;': '>', '&#39;': "'",
+          };
+          return entities[entity] || entity;
+        })
+        .slice(0, 150);
+
+      return {
+        id: `yonhap-${Date.now()}-${index}`,
+        title: decodeHTMLEntities(title),
+        summary: cleanSummary,
+        url: link,
+        source: '연합뉴스',
+        publishedAt: pubDate ? new Date(pubDate) : new Date(),
+      };
+    }).filter((item: NewsItem) => !isMeaninglessTitle(item.title));
+
+    return NextResponse.json(
+      { news, source: 'yonhap' },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=300',
+        },
+      }
+    );
+  } catch (error) {
+    console.error('연합뉴스 RSS 오류:', error);
+
+    // 에러 시 목업 데이터 반환
+    return NextResponse.json(
+      { news: getMockNews(), source: 'mock', error: String(error) },
+      { status: 200 }
+    );
+  }
 }
 
 /**
@@ -64,11 +141,8 @@ async function handleNaverNews(source: string, city: string) {
   }
 
   try {
-    // 소스별 검색 쿼리 설정
+    // 검색 쿼리 설정
     let query = '주요 뉴스'; // 기본값
-    if (source === 'yonhap') {
-      query = '연합뉴스';
-    }
 
     // 지역이 선택된 경우 지역 뉴스 검색
     if (city && CITY_NAME_MAP[city]) {
