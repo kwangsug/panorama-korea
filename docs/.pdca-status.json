@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-01-28T06:46:56.068Z",
+  "lastUpdated": "2026-01-28T06:51:06.800Z",
   "activeFeatures": [
     "panorama-korea",
     "widgets",
@@ -33,7 +33,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-01-28T00:46:45.282Z",
-        "lastUpdated": "2026-01-28T06:46:56.068Z"
+        "lastUpdated": "2026-01-28T06:51:06.800Z"
       }
     },
     "jobs": {
@@ -105,15 +105,9 @@
   "session": {
     "startedAt": "2026-01-28T00:37:09.466Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-01-28T06:46:56.068Z"
+    "lastActivity": "2026-01-28T06:51:06.800Z"
   },
   "history": [
-    {
-      "timestamp": "2026-01-28T05:14:40.319Z",
-      "feature": "widgets",
-      "phase": "do",
-      "action": "updated"
-    },
     {
       "timestamp": "2026-01-28T05:15:01.928Z",
       "feature": "panorama-korea",
@@ -704,6 +698,12 @@
     },
     {
       "timestamp": "2026-01-28T06:46:56.068Z",
+      "feature": "widgets",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-01-28T06:51:06.800Z",
       "feature": "widgets",
       "phase": "do",
       "action": "updated"

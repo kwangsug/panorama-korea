@@ -392,15 +392,28 @@ export function ClockWidget() {
             </div>
           </div>
 
-          {/* 다음 4개 아이템 (호버 시 표시) */}
-          {isTickerHovered && (
-            <div className="space-y-2 mt-2 animate-[slideUp_0.3s_ease-out]">
-              {[1, 2, 3, 4].map((offset) => {
-                const nextIndex = (tickerIndex + offset) % tickerItems.length;
-                const item = tickerItems[nextIndex];
-                return (
+          {/* 다음 4개 아이템 (호버 시 표시 - 같은 타입만) */}
+          {isTickerHovered && (() => {
+            // 현재 아이템과 같은 타입만 필터링
+            const currentType = tickerItems[tickerIndex].type;
+            const sameTypeItems = tickerItems.filter(item => item.type === currentType);
+
+            // 현재 아이템의 인덱스 찾기
+            const currentIndexInFiltered = sameTypeItems.findIndex(
+              item => item.title === tickerItems[tickerIndex].title
+            );
+
+            // 다음 4개 아이템 선택 (순환)
+            const nextItems = [1, 2, 3, 4].map(offset => {
+              const nextIdx = (currentIndexInFiltered + offset) % sameTypeItems.length;
+              return sameTypeItems[nextIdx];
+            }).filter(Boolean);
+
+            return (
+              <div className="space-y-2 mt-2 animate-[slideUp_0.3s_ease-out]">
+                {nextItems.map((item, idx) => (
                   <div
-                    key={nextIndex}
+                    key={`${currentType}-${idx}`}
                     className="flex items-center gap-2"
                   >
                     <span className={`text-sm px-2 py-0.5 rounded flex-shrink-0 ${
@@ -418,10 +431,10 @@ export function ClockWidget() {
                       </span>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                ))}
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>
