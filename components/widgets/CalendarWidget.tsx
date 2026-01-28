@@ -33,6 +33,7 @@ export function CalendarWidget({
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [holiday, setHoliday] = useState<string | null>(null);
+  const [nextEvent, setNextEvent] = useState<CalendarEvent | null>(null);
 
   // 캘린더 데이터 로드
   useEffect(() => {
@@ -41,7 +42,6 @@ export function CalendarWidget({
         const enabledSources = calendarSources.filter(s => s.enabled);
         if (enabledSources.length === 0) {
           setEvents([]);
-          setNextEvent(null);
           setLoading(false);
           return;
         }
