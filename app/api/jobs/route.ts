@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'edge';
+// Node.js 런타임 사용을 위해 edge 설정 제거
 
 interface JobItem {
   title: string;
@@ -47,13 +47,16 @@ export async function GET(request: Request) {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; PanoramaKorea/1.0)',
       },
+      next: { revalidate: 60 }, // 1분 캐시 설정
     });
 
     if (!response.ok) {
       throw new Error('RSS fetch failed');
     }
 
-    const xml = await response.text();
+    const buffer = await response.arrayBuffer();
+    const decoder = new TextDecoder('euc-kr');
+    const xml = decoder.decode(buffer);
     const { jobs, feedTitle } = parseRSS(xml);
 
     return NextResponse.json({ jobs, feedTitle });
