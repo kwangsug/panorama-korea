@@ -1,47 +1,269 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ClockWidget } from '@/components/widgets/ClockWidget';
 import { WeatherWidget } from '@/components/widgets/WeatherWidget';
 import { NewsWidget } from '@/components/widgets/NewsWidget';
+import { JobWidget } from '@/components/widgets/JobWidget';
+import { MAJOR_CITIES, type CityName } from '@/lib/api/weather';
+
+type ContentView = 'weather' | 'news' | 'jobs';
+
+const VIEWS: ContentView[] = ['weather', 'news', 'jobs'];
 
 export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
+  const [currentView, setCurrentView] = useState<ContentView>('weather');
+  const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [swipeAxis, setSwipeAxis] = useState<'horizontal' | 'vertical' | null>(null);
+  const [showSettingsHint, setShowSettingsHint] = useState(false);
 
-  // 왼쪽에서 드래그 감지
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.touches[0].clientX);
-  };
+  // Settings state
+  const [selectedCity, setSelectedCity] = useState<CityName>('Seoul');
+  const [newsSource, setNewsSource] = useState<'naver' | 'yonhap'>('naver');
+  const [autoSwitchSeconds, setAutoSwitchSeconds] = useState(30);
+  const [newsRotationSeconds, setNewsRotationSeconds] = useState(15);
+  const [jobRotationSeconds, setJobRotationSeconds] = useState(10);
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.touches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    // 왼쪽에서 오른쪽으로 50px 이상 드래그
-    if (touchStart < 50 && touchEnd - touchStart > 100) {
-      setSettingsOpen(true);
+  // 설정 로드
+  useEffect(() => {
+    const saved = localStorage.getItem('panorama-settings');
+    if (saved) {
+      try {
+        const settings = JSON.parse(saved);
+        if (settings.selectedCity) setSelectedCity(settings.selectedCity);
+        if (settings.newsSource) setNewsSource(settings.newsSource);
+        if (settings.autoSwitchSeconds) setAutoSwitchSeconds(settings.autoSwitchSeconds);
+        if (settings.newsRotationSeconds) setNewsRotationSeconds(settings.newsRotationSeconds);
+        if (settings.jobRotationSeconds) setJobRotationSeconds(settings.jobRotationSeconds);
+      } catch (e) {
+        console.error('설정 로드 실패:', e);
+      }
     }
-    setTouchStart(0);
-    setTouchEnd(0);
+  }, []);
+
+  // 설정 저장
+  const saveSettings = (updates: Record<string, unknown>) => {
+    const saved = localStorage.getItem('panorama-settings');
+    const current = saved ? JSON.parse(saved) : {};
+    const newSettings = { ...current, ...updates };
+    localStorage.setItem('panorama-settings', JSON.stringify(newSettings));
+  };
+
+  // 자동 전환 (설정된 초 간격)
+  useEffect(() => {
+    if (autoSwitchSeconds <= 0) return;
+    const interval = setInterval(() => {
+      setCurrentView((prev) => {
+        const currentIdx = VIEWS.indexOf(prev);
+        return VIEWS[(currentIdx + 1) % VIEWS.length];
+      });
+    }, autoSwitchSeconds * 1000);
+    return () => clearInterval(interval);
+  }, [autoSwitchSeconds]);
+
+  // 포인터 이벤트로 통합 스와이프 감지 (터치 + 마우스)
+  const handlePointerDown = (e: React.PointerEvent) => {
+    setTouchStart({
+      x: e.clientX,
+      y: e.clientY,
+    });
+    setIsDragging(true);
+    setDragOffset(0);
+    setSwipeAxis(null); // 방향 초기화
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDragging) return;
+
+    const diffX = e.clientX - touchStart.x;
+    const diffY = e.clientY - touchStart.y;
+
+    // 방향이 아직 결정되지 않은 경우, 8px 이상 움직이면 방향 결정
+    if (!swipeAxis && (Math.abs(diffX) > 8 || Math.abs(diffY) > 8)) {
+      // 세로가 가로보다 크면 세로로 판정 (세로 스와이프 우선)
+      if (Math.abs(diffY) >= Math.abs(diffX)) {
+        setSwipeAxis('vertical');
+      } else {
+        setSwipeAxis('horizontal');
+      }
+    }
+
+    // 세로 스와이프일 때만 위젯 드래그 적용
+    if (swipeAxis === 'vertical') {
+      setDragOffset(diffY);
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    const diffX = touchStart.x - e.clientX;
+    const diffY = touchStart.y - e.clientY;
+    const screenWidth = window.innerWidth;
+
+    // 오른쪽 가장자리에서 왼쪽으로 스와이프 → 설정 열기
+    if (touchStart.x > screenWidth - 100 && diffX > 30) {
+      setIsDragging(false);
+      setDragOffset(0);
+      setSwipeAxis(null);
+      setSettingsOpen(true);
+      return;
+    }
+
+    // 설정이 열린 상태에서 오른쪽으로 스와이프 → 설정 닫기
+    if (settingsOpen && diffX < -30) {
+      setIsDragging(false);
+      setDragOffset(0);
+      setSwipeAxis(null);
+      setSettingsOpen(false);
+      return;
+    }
+
+    // 세로 스와이프로 위젯 전환 (방향이 vertical로 잠긴 경우만, 30px 이상)
+    if (swipeAxis === 'vertical' && Math.abs(diffY) > 30) {
+      const currentIdx = VIEWS.indexOf(currentView);
+      if (diffY > 0) {
+        // 위로 스와이프 → 다음 위젯
+        setCurrentView(VIEWS[(currentIdx + 1) % VIEWS.length]);
+      } else {
+        // 아래로 스와이프 → 이전 위젯
+        setCurrentView(VIEWS[(currentIdx - 1 + VIEWS.length) % VIEWS.length]);
+      }
+    }
+
+    setIsDragging(false);
+    setDragOffset(0);
+    setSwipeAxis(null);
+  };
+
+  // 위젯 transform 계산 함수
+  const getWidgetTransform = (view: ContentView) => {
+    const currentIdx = VIEWS.indexOf(currentView);
+    const viewIdx = VIEWS.indexOf(view);
+    const diff = viewIdx - currentIdx;
+
+    // 드래그 중일 때 실시간으로 위치 반영
+    const dragPx = isDragging ? dragOffset : 0;
+
+    if (view === currentView) {
+      const scale = isDragging ? Math.max(0.95, 1 - Math.abs(dragOffset) / 1000) : 1;
+      return `translateY(${dragPx}px) scale(${scale})`;
+    } else {
+      // 다음/이전 위젯 위치
+      const baseOffset = diff > 0 ? 100 : -100;
+      // 드래그 방향에 따라 다음 위젯 미리보기
+      const previewOffset = isDragging ? dragOffset * 0.5 : 0;
+      return `translateY(calc(${baseOffset}% + ${previewOffset}px)) scale(0.85)`;
+    }
+  };
+
+  const getWidgetOpacity = (view: ContentView) => {
+    if (view === currentView) {
+      return isDragging ? Math.max(0.7, 1 - Math.abs(dragOffset) / 500) : 1;
+    }
+    // 드래그 방향의 다음 위젯만 보이기
+    const currentIdx = VIEWS.indexOf(currentView);
+    const viewIdx = VIEWS.indexOf(view);
+    const diff = viewIdx - currentIdx;
+
+    if (isDragging) {
+      // 드래그 방향에 있는 위젯 보이기
+      if ((dragOffset < 0 && diff === 1) || (dragOffset > 0 && diff === -1)) {
+        return Math.min(0.6, Math.abs(dragOffset) / 200);
+      }
+    }
+    return 0.3;
   };
 
   return (
-    <div
-      className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* Settings Sidebar */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden flex items-center justify-center">
+      {/* Dashboard Container - 32:9 Aspect Ratio (1920x540) */}
+      <div className="w-full max-w-[1920px] aspect-[32/9] p-4 md:p-6 flex gap-4 md:gap-5">
+        {/* Clock Widget - 왼쪽 (반응형) */}
+        <div className="w-[280px] md:w-[360px] lg:w-[480px] flex-shrink-0 h-full">
+          <ClockWidget />
+        </div>
+
+        {/* Content Area - 위젯 영역에서만 스와이프 반응 */}
+        <div
+          className="flex-1 h-full relative overflow-hidden"
+          style={{ perspective: '1200px' }}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={() => { setIsDragging(false); setDragOffset(0); }}
+        >
+          {/* Weather Widget (index 0) */}
+          <div
+            className={`absolute inset-0 ${isDragging ? '' : 'transition-all duration-500 ease-out'} ${
+              currentView === 'weather' ? 'pointer-events-auto' : 'pointer-events-none'
+            }`}
+            style={{
+              transform: getWidgetTransform('weather'),
+              opacity: getWidgetOpacity('weather'),
+              transformOrigin: 'center center',
+            }}
+          >
+            <WeatherWidget />
+          </div>
+
+          {/* News Widget (index 1) */}
+          <div
+            className={`absolute inset-0 ${isDragging ? '' : 'transition-all duration-500 ease-out'} ${
+              currentView === 'news' ? 'pointer-events-auto' : 'pointer-events-none'
+            }`}
+            style={{
+              transform: getWidgetTransform('news'),
+              opacity: getWidgetOpacity('news'),
+              transformOrigin: 'center center',
+            }}
+          >
+            <NewsWidget rotationSeconds={newsRotationSeconds} />
+          </div>
+
+          {/* Job Widget (index 2) */}
+          <div
+            className={`absolute inset-0 ${isDragging ? '' : 'transition-all duration-500 ease-out'} ${
+              currentView === 'jobs' ? 'pointer-events-auto' : 'pointer-events-none'
+            }`}
+            style={{
+              transform: getWidgetTransform('jobs'),
+              opacity: getWidgetOpacity('jobs'),
+              transformOrigin: 'center center',
+            }}
+          >
+            <JobWidget rotationSeconds={jobRotationSeconds} />
+          </div>
+
+          {/* Vertical Page Indicator - Inside Widget */}
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-10">
+            <div
+              className={`w-2 rounded-full transition-all duration-300 ${
+                currentView === 'weather' ? 'bg-blue-400 h-6' : 'bg-white/30 h-2'
+              }`}
+            />
+            <div
+              className={`w-2 rounded-full transition-all duration-300 ${
+                currentView === 'news' ? 'bg-green-400 h-6' : 'bg-white/30 h-2'
+              }`}
+            />
+            <div
+              className={`w-2 rounded-full transition-all duration-300 ${
+                currentView === 'jobs' ? 'bg-orange-400 h-6' : 'bg-white/30 h-2'
+              }`}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Settings Sidebar - Right Side */}
       <div
-        className={`fixed inset-y-0 left-0 w-80 bg-black/40 backdrop-blur-xl border-r border-white/10 transform transition-transform duration-300 ease-in-out z-50 ${
-          settingsOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-y-0 right-0 w-80 bg-black/80 backdrop-blur-xl border-l border-white/10 transform transition-transform duration-300 ease-in-out z-50 ${
+          settingsOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="p-6">
+        <div className="p-6 h-full overflow-y-auto">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-white">설정</h2>
             <button
@@ -54,100 +276,181 @@ export default function Home() {
 
           {/* Settings Options */}
           <div className="space-y-4">
+            {/* 위치 설정 */}
             <div className="bg-white/10 rounded-lg p-4">
-              <h3 className="text-white font-semibold mb-2">위젯 표시</h3>
-              <div className="space-y-2 text-sm text-gray-300">
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" defaultChecked className="rounded" />
-                  <span>시계</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" defaultChecked className="rounded" />
-                  <span>날씨</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" defaultChecked className="rounded" />
-                  <span>뉴스</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" defaultChecked className="rounded" />
-                  <span>캘린더</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="bg-white/10 rounded-lg p-4">
-              <h3 className="text-white font-semibold mb-2">테마</h3>
-              <div className="space-y-2 text-sm text-gray-300">
-                <label className="flex items-center gap-2">
-                  <input type="radio" name="theme" defaultChecked />
-                  <span>다크</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input type="radio" name="theme" />
-                  <span>라이트</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="bg-white/10 rounded-lg p-4">
-              <h3 className="text-white font-semibold mb-2">뉴스 소스</h3>
-              <select className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm">
-                <option value="naver">네이버 뉴스</option>
-                <option value="yonhap">연합뉴스</option>
+              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                <span>📍</span> 위치 설정
+              </h3>
+              <select
+                value={selectedCity}
+                onChange={(e) => {
+                  setSelectedCity(e.target.value as CityName);
+                  saveSettings({ selectedCity: e.target.value });
+                }}
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm"
+              >
+                {Object.entries(MAJOR_CITIES).map(([key, city]) => (
+                  <option key={key} value={key} className="bg-slate-800">
+                    {city.nameKr}
+                  </option>
+                ))}
               </select>
             </div>
+
+            {/* 뉴스 소스 */}
+            <div className="bg-white/10 rounded-lg p-4">
+              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                <span>📰</span> 뉴스 소스
+              </h3>
+              <select
+                value={newsSource}
+                onChange={(e) => {
+                  const value = e.target.value as 'naver' | 'yonhap';
+                  setNewsSource(value);
+                  saveSettings({ newsSource: value });
+                }}
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm"
+              >
+                <option value="naver" className="bg-slate-800">네이버 뉴스</option>
+                <option value="yonhap" className="bg-slate-800">연합뉴스</option>
+              </select>
+              <p className="mt-2 text-xs text-gray-400">
+                뉴스 소스 변경 시 새로고침 필요
+              </p>
+            </div>
+
+            {/* 자동 전환 */}
+            <div className="bg-white/10 rounded-lg p-4">
+              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                <span>🔄</span> 자동 전환
+              </h3>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-300">전환 간격</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="300"
+                  value={autoSwitchSeconds}
+                  onChange={(e) => {
+                    const value = Math.max(0, Math.min(300, Number(e.target.value)));
+                    setAutoSwitchSeconds(value);
+                    saveSettings({ autoSwitchSeconds: value });
+                  }}
+                  className="w-20 bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-white text-sm text-center"
+                />
+                <span className="text-sm text-gray-400">초</span>
+              </div>
+              <p className="mt-2 text-xs text-gray-400">
+                0으로 설정하면 자동 전환 비활성화
+              </p>
+            </div>
+
+            {/* 콘텐츠 전환 주기 */}
+            <div className="bg-white/10 rounded-lg p-4">
+              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                <span>⏱️</span> 콘텐츠 전환 주기
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-300">뉴스</span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      max="120"
+                      value={newsRotationSeconds}
+                      onChange={(e) => {
+                        const value = Math.max(0, Math.min(120, Number(e.target.value)));
+                        setNewsRotationSeconds(value);
+                        saveSettings({ newsRotationSeconds: value });
+                      }}
+                      className="w-16 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-sm text-center"
+                    />
+                    <span className="text-sm text-gray-400">초</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-300">채용정보</span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      max="120"
+                      value={jobRotationSeconds}
+                      onChange={(e) => {
+                        const value = Math.max(0, Math.min(120, Number(e.target.value)));
+                        setJobRotationSeconds(value);
+                        saveSettings({ jobRotationSeconds: value });
+                      }}
+                      className="w-16 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-sm text-center"
+                    />
+                    <span className="text-sm text-gray-400">초</span>
+                  </div>
+                </div>
+              </div>
+              <p className="mt-2 text-xs text-gray-400">
+                0으로 설정하면 자동 전환 비활성화
+              </p>
+            </div>
+
+            {/* 정보 */}
+            <div className="bg-white/10 rounded-lg p-4">
+              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                <span>ℹ️</span> 정보
+              </h3>
+              <div className="space-y-2 text-sm text-gray-300">
+                <p>버전: 1.0.0</p>
+                <p>
+                  <a
+                    href="https://github.com/user/panorama-korea"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:underline"
+                  >
+                    GitHub
+                  </a>
+                </p>
+              </div>
+            </div>
+
+            {/* 설정 닫기 버튼 */}
+            <button
+              onClick={() => setSettingsOpen(false)}
+              className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors"
+            >
+              설정 닫기
+            </button>
           </div>
+
         </div>
       </div>
 
-      {/* Overlay */}
+      {/* Settings Hint - Right Edge */}
+      {!settingsOpen && (
+        <div
+          className="fixed right-0 top-0 bottom-0 w-16 z-30 flex items-center justify-end cursor-w-resize"
+          onMouseEnter={() => setShowSettingsHint(true)}
+          onMouseLeave={() => setShowSettingsHint(false)}
+          onClick={() => setSettingsOpen(true)}
+        >
+          <div
+            className={`flex items-center gap-1 px-2 py-4 bg-black/40 backdrop-blur-sm rounded-l-lg transition-all duration-300 ${
+              showSettingsHint ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+            }`}
+          >
+            <span className="text-white/80 text-lg">◀</span>
+            <span className="text-white/80 text-xl">⚙️</span>
+          </div>
+        </div>
+      )}
+
+      {/* Overlay when settings open */}
       {settingsOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40"
+          className="fixed inset-0 bg-black/30 z-40"
           onClick={() => setSettingsOpen(false)}
         />
       )}
-
-      {/* Main Content - Vertical Scroll */}
-      <main className="h-screen overflow-y-auto px-6 py-6 space-y-6 pb-20">
-        {/* Clock Widget */}
-        <ClockWidget />
-
-        {/* Weather Widget */}
-        <WeatherWidget />
-
-        {/* News Widget */}
-        <NewsWidget />
-
-        {/* Calendar Widget */}
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 hover:bg-white/15 transition-all border border-white/20">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-purple-500/30 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <span className="text-2xl">📅</span>
-            </div>
-            <h2 className="text-2xl font-semibold text-white">캘린더</h2>
-          </div>
-          <div className="space-y-3">
-            <div className="text-gray-200">
-              <p className="text-sm text-gray-400 mb-2">오늘의 일정</p>
-              <div className="space-y-2">
-                <div className="bg-white/10 rounded-lg p-3">
-                  <p className="text-sm font-medium">공휴일 및 일정 표시 예정</p>
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 text-sm text-gray-400">
-              한국 공휴일 API 연동 예정
-            </div>
-          </div>
-        </div>
-      </main>
-
-      {/* Drag Hint */}
-      <div className="fixed bottom-4 left-4 text-xs text-gray-500 bg-black/20 backdrop-blur-sm px-3 py-2 rounded-lg">
-        ← 왼쪽에서 드래그하여 설정
-      </div>
     </div>
   );
 }

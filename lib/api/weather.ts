@@ -1,18 +1,19 @@
 /**
- * OpenWeatherMap One Call API 3.0 클라이언트
+ * Open-Meteo API 클라이언트
  *
- * API 키 발급: https://openweathermap.org/api
- * One Call API 3.0 구독 필요
- * 무료 플랜: 1,000 calls/day
+ * API 문서: https://open-meteo.com/
+ * 완전 무료, API 키 불필요
  *
- * 하나의 API로 제공:
+ * 제공 데이터:
  * - 현재 날씨
- * - 시간별 예보 (48시간)
- * - 일별 예보 (8일)
+ * - 시간별 예보
+ * - 일별 예보 (16일)
  */
 
 export interface WeatherData {
   temperature: number;
+  maxTemp: number;
+  minTemp: number;
   condition: string;
   conditionIcon: string;
   humidity: number;
@@ -44,44 +45,70 @@ export const MAJOR_CITIES = {
 
 export type CityName = keyof typeof MAJOR_CITIES;
 
-// 날씨 상태 한글 매핑
-const WEATHER_CONDITION_KR: Record<string, string> = {
-  Clear: '맑음',
-  Clouds: '구름많음',
-  Rain: '비',
-  Drizzle: '이슬비',
-  Thunderstorm: '천둥번개',
-  Snow: '눈',
-  Mist: '안개',
-  Smoke: '연무',
-  Haze: '실안개',
-  Dust: '먼지',
-  Fog: '안개',
-  Sand: '황사',
-  Ash: '화산재',
-  Squall: '돌풍',
-  Tornado: '토네이도',
+// WMO 날씨 코드 → 한글 + 아이콘 매핑
+// https://open-meteo.com/en/docs (WMO Weather interpretation codes)
+const WMO_WEATHER_CODES: Record<number, { condition: string; iconDay: string; iconNight: string }> = {
+  0: { condition: '맑음', iconDay: '01d', iconNight: '01n' },
+  1: { condition: '대체로 맑음', iconDay: '01d', iconNight: '01n' },
+  2: { condition: '구름 조금', iconDay: '02d', iconNight: '02n' },
+  3: { condition: '흐림', iconDay: '04d', iconNight: '04n' },
+  45: { condition: '안개', iconDay: '50d', iconNight: '50n' },
+  48: { condition: '짙은 안개', iconDay: '50d', iconNight: '50n' },
+  51: { condition: '이슬비', iconDay: '09d', iconNight: '09n' },
+  53: { condition: '이슬비', iconDay: '09d', iconNight: '09n' },
+  55: { condition: '이슬비', iconDay: '09d', iconNight: '09n' },
+  56: { condition: '진눈깨비', iconDay: '13d', iconNight: '13n' },
+  57: { condition: '진눈깨비', iconDay: '13d', iconNight: '13n' },
+  61: { condition: '약한 비', iconDay: '10d', iconNight: '10n' },
+  63: { condition: '비', iconDay: '10d', iconNight: '10n' },
+  65: { condition: '강한 비', iconDay: '10d', iconNight: '10n' },
+  66: { condition: '진눈깨비', iconDay: '13d', iconNight: '13n' },
+  67: { condition: '진눈깨비', iconDay: '13d', iconNight: '13n' },
+  71: { condition: '약한 눈', iconDay: '13d', iconNight: '13n' },
+  73: { condition: '눈', iconDay: '13d', iconNight: '13n' },
+  75: { condition: '폭설', iconDay: '13d', iconNight: '13n' },
+  77: { condition: '눈', iconDay: '13d', iconNight: '13n' },
+  80: { condition: '소나기', iconDay: '09d', iconNight: '09n' },
+  81: { condition: '소나기', iconDay: '09d', iconNight: '09n' },
+  82: { condition: '폭우', iconDay: '09d', iconNight: '09n' },
+  85: { condition: '눈보라', iconDay: '13d', iconNight: '13n' },
+  86: { condition: '폭설', iconDay: '13d', iconNight: '13n' },
+  95: { condition: '천둥번개', iconDay: '11d', iconNight: '11n' },
+  96: { condition: '뇌우', iconDay: '11d', iconNight: '11n' },
+  99: { condition: '심한 뇌우', iconDay: '11d', iconNight: '11n' },
 };
 
 /**
- * One Call API 3.0으로 현재 날씨 조회
+ * 낮/밤 판단 (간단히 6시~18시를 낮으로)
+ */
+function isDay(): boolean {
+  const hour = new Date().getHours();
+  return hour >= 6 && hour < 18;
+}
+
+/**
+ * WMO 코드를 조건 및 아이콘으로 변환
+ */
+function getWeatherFromCode(code: number): { condition: string; icon: string } {
+  const weather = WMO_WEATHER_CODES[code] || WMO_WEATHER_CODES[0];
+  return {
+    condition: weather.condition,
+    icon: isDay() ? weather.iconDay : weather.iconNight,
+  };
+}
+
+/**
+ * Open-Meteo API로 현재 날씨 조회
  */
 export async function getCurrentWeather(city: CityName = 'Seoul'): Promise<WeatherData> {
-  const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
-
-  // API 키가 없으면 목업 데이터 반환
-  if (!apiKey) {
-    return getMockWeather(city);
-  }
-
   try {
     const { lat, lon, nameKr } = MAJOR_CITIES[city];
 
-    // One Call API 3.0 엔드포인트
-    const url = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=kr&exclude=minutely,hourly,alerts`;
+    // Open-Meteo API 엔드포인트
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=Asia/Seoul&forecast_days=1`;
 
     const response = await fetch(url, {
-      next: { revalidate: 600 }, // 10분마다 캐시 갱신
+      next: { revalidate: 1800 }, // 30분마다 캐시 갱신
     });
 
     if (!response.ok) {
@@ -89,44 +116,40 @@ export async function getCurrentWeather(city: CityName = 'Seoul'): Promise<Weath
     }
 
     const data = await response.json();
-
-    // current 데이터에서 정보 추출
     const current = data.current;
+    const daily = data.daily;
+
+    const { condition, icon } = getWeatherFromCode(current.weather_code);
 
     return {
-      temperature: Math.round(current.temp),
-      condition: WEATHER_CONDITION_KR[current.weather[0].main] || current.weather[0].description,
-      conditionIcon: current.weather[0].icon,
-      humidity: current.humidity,
-      windSpeed: current.wind_speed,
+      temperature: Math.round(current.temperature_2m),
+      maxTemp: Math.round(daily.temperature_2m_max[0]),
+      minTemp: Math.round(daily.temperature_2m_min[0]),
+      condition,
+      conditionIcon: icon,
+      humidity: current.relative_humidity_2m,
+      windSpeed: Math.round(current.wind_speed_10m * 10) / 10, // km/h → 소수점 1자리
       location: nameKr,
       updatedAt: new Date(),
     };
   } catch (error) {
-    console.error('OpenWeatherMap One Call API 오류:', error);
+    console.error('Open-Meteo API 오류:', error);
     return getMockWeather(city);
   }
 }
 
 /**
- * One Call API 3.0으로 일별 예보 조회
+ * Open-Meteo API로 일별 예보 조회
  */
 export async function getWeatherForecast(city: CityName = 'Seoul'): Promise<WeatherForecast[]> {
-  const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
-
-  // API 키가 없으면 목업 데이터 반환
-  if (!apiKey) {
-    return generateMockForecast();
-  }
-
   try {
     const { lat, lon } = MAJOR_CITIES[city];
 
-    // One Call API 3.0 엔드포인트
-    const url = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=kr&exclude=minutely,hourly,current,alerts`;
+    // Open-Meteo API 엔드포인트 (7일 예보)
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max&timezone=Asia/Seoul&forecast_days=7`;
 
     const response = await fetch(url, {
-      next: { revalidate: 3600 }, // 1시간마다 캐시 갱신
+      next: { revalidate: 1800 }, // 30분마다 캐시 갱신
     });
 
     if (!response.ok) {
@@ -134,24 +157,24 @@ export async function getWeatherForecast(city: CityName = 'Seoul'): Promise<Weat
     }
 
     const data = await response.json();
+    const daily = data.daily;
 
-    // daily 데이터에서 예보 추출 (첫 5일)
-    const forecasts: WeatherForecast[] = data.daily.slice(0, 5).map((day: any) => {
-      const date = new Date(day.dt * 1000); // Unix timestamp to Date
+    const forecasts: WeatherForecast[] = daily.time.slice(0, 5).map((date: string, i: number) => {
+      const { condition, icon } = getWeatherFromCode(daily.weather_code[i]);
 
       return {
-        date: date.toISOString().slice(0, 10),
-        maxTemp: Math.round(day.temp.max),
-        minTemp: Math.round(day.temp.min),
-        condition: WEATHER_CONDITION_KR[day.weather[0].main] || day.weather[0].description,
-        conditionIcon: day.weather[0].icon,
-        precipitation: Math.round((day.pop || 0) * 100), // 강수 확률 (%)
+        date,
+        maxTemp: Math.round(daily.temperature_2m_max[i]),
+        minTemp: Math.round(daily.temperature_2m_min[i]),
+        condition,
+        conditionIcon: icon, // 예보는 낮 아이콘 사용
+        precipitation: daily.precipitation_probability_max[i] || 0,
       };
     });
 
     return forecasts;
   } catch (error) {
-    console.error('OpenWeatherMap One Call Forecast API 오류:', error);
+    console.error('Open-Meteo Forecast API 오류:', error);
     return generateMockForecast();
   }
 }
@@ -162,6 +185,8 @@ export async function getWeatherForecast(city: CityName = 'Seoul'): Promise<Weat
 function getMockWeather(city: CityName): WeatherData {
   return {
     temperature: 15,
+    maxTemp: 18,
+    minTemp: 8,
     condition: '맑음',
     conditionIcon: '01d',
     humidity: 60,

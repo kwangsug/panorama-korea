@@ -21,11 +21,19 @@
     "traffic": "실시간 교통정보"
   },
   "pdca": {
-    "current_phase": "init",
-    "plan": null,
-    "design": null,
+    "current_feature": "widgets",
+    "current_phase": "do",
+    "plan": "docs/01-plan/project-overview.md",
+    "design": "docs/02-design/features/widgets.design.md",
     "analysis": null,
-    "report": null
+    "report": null,
+    "implemented": [
+      "ClockWidget (flip card style, 320px)",
+      "WeatherWidget (OpenWeatherMap 3.0, 480px)",
+      "NewsWidget (Naver API, 2-column grid)",
+      "1920x540 horizontal dashboard layout",
+      "Settings modal"
+    ]
   },
   "reference": {
     "original": "https://panorama-2ps.pages.dev/",

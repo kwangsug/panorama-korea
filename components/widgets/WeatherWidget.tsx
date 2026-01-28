@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getCurrentWeather, getWeatherForecast, type WeatherData, type WeatherForecast, type CityName } from '@/lib/api/weather';
 
 export function WeatherWidget() {
@@ -10,15 +10,21 @@ export function WeatherWidget() {
   const [selectedCity, setSelectedCity] = useState<CityName>('Seoul');
 
   useEffect(() => {
-    loadWeatherData();
-    // 10분마다 자동 업데이트
-    const interval = setInterval(loadWeatherData, 600000);
-    return () => clearInterval(interval);
-  }, [selectedCity]);
+    const savedSettings = localStorage.getItem('panorama-settings');
+    if (savedSettings) {
+      try {
+        const settings = JSON.parse(savedSettings);
+        if (settings.selectedCity) {
+          setSelectedCity(settings.selectedCity);
+        }
+      } catch (error) {
+        console.error('설정 로드 실패:', error);
+      }
+    }
+  }, []);
 
-  async function loadWeatherData() {
+  const loadWeatherData = useCallback(async () => {
     try {
-      setLoading(true);
       const [currentWeather, forecastData] = await Promise.all([
         getCurrentWeather(selectedCity),
         getWeatherForecast(selectedCity),
@@ -30,127 +36,133 @@ export function WeatherWidget() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [selectedCity]);
+
+  useEffect(() => {
+    loadWeatherData();
+    // 30분마다 자동 업데이트
+    const interval = setInterval(loadWeatherData, 1800000);
+    return () => clearInterval(interval);
+  }, [loadWeatherData]);
 
   if (loading || !weather) {
     return (
-      <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 border border-white/20">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-blue-500/30 rounded-full flex items-center justify-center backdrop-blur-sm">
-            <span className="text-2xl">☀️</span>
+      <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 bg-blue-500/30 rounded-full flex items-center justify-center">
+            <span className="text-lg">☀️</span>
           </div>
-          <h2 className="text-2xl font-semibold text-white">날씨</h2>
+          <h2 className="text-lg font-semibold text-white">날씨</h2>
         </div>
-        <div className="animate-pulse space-y-3">
-          <div className="h-4 bg-white/20 rounded w-3/4"></div>
-          <div className="h-4 bg-white/20 rounded w-1/2"></div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-pulse text-gray-400">날씨 로딩 중...</div>
         </div>
       </div>
     );
   }
 
+  // 아이콘 코드에 따른 이모지 폴백
+  const getWeatherEmoji = (iconCode: string) => {
+    const emojiMap: Record<string, string> = {
+      '01d': '☀️', '01n': '🌙',
+      '02d': '⛅', '02n': '☁️',
+      '03d': '☁️', '03n': '☁️',
+      '04d': '☁️', '04n': '☁️',
+      '09d': '🌧️', '09n': '🌧️',
+      '10d': '🌦️', '10n': '🌧️',
+      '11d': '⛈️', '11n': '⛈️',
+      '13d': '❄️', '13n': '❄️',
+      '50d': '🌫️', '50n': '🌫️',
+    };
+    return emojiMap[iconCode] || '☀️';
+  };
+
   return (
-    <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 hover:bg-white/15 transition-all border border-white/20">
-      {/* 헤더 */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-blue-500/30 rounded-full flex items-center justify-center backdrop-blur-sm">
-            <span className="text-2xl">☀️</span>
+    <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-blue-500/30 rounded-full flex items-center justify-center">
+            <span className="text-lg">{getWeatherEmoji(weather.conditionIcon)}</span>
           </div>
           <div>
-            <h2 className="text-2xl font-semibold text-white">날씨</h2>
-            <p className="text-sm text-gray-300">{weather.location}</p>
+            <h2 className="text-lg font-semibold text-white">날씨</h2>
+            <p className="text-xs text-gray-400">{weather.location}</p>
           </div>
         </div>
-        <button
-          onClick={loadWeatherData}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-          title="새로고침"
-        >
-          <span className="text-xl">🔄</span>
-        </button>
+        <div className="text-xs text-gray-500">
+          {weather.updatedAt.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 업데이트
+        </div>
       </div>
 
-      {/* 현재 날씨 */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
+      {/* Content */}
+      <div className="flex-1 flex items-center gap-8">
+        {/* Current Weather - Left */}
+        <div className="flex items-center gap-6">
+          {/* Weather Icon */}
+          <div className="text-8xl leading-none">
+            {getWeatherEmoji(weather.conditionIcon)}
+          </div>
+          {/* Temperature & Condition */}
           <div>
-            <div className="text-6xl font-bold text-white">
+            <div className="text-8xl font-bold text-white leading-none">
               {weather.temperature}°
             </div>
-            <div className="text-xl text-gray-200 mt-2">
-              {weather.condition}
-            </div>
-          </div>
-          <img
-            src={`https://openweathermap.org/img/wn/${weather.conditionIcon}@2x.png`}
-            alt={weather.condition}
-            className="w-24 h-24"
-          />
-        </div>
-
-        {/* 세부 정보 */}
-        <div className="grid grid-cols-2 gap-4 mt-4">
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="text-sm text-gray-300">습도</div>
-            <div className="text-lg font-semibold text-white">
-              {weather.humidity}%
-            </div>
-          </div>
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="text-sm text-gray-300">풍속</div>
-            <div className="text-lg font-semibold text-white">
-              {weather.windSpeed} m/s
+            <div className="flex items-center gap-3 mt-2">
+              <span className="text-2xl text-gray-200">{weather.condition}</span>
+              <span className="text-lg text-blue-300">▲{weather.maxTemp}°</span>
+              <span className="text-lg text-gray-400">▼{weather.minTemp}°</span>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* 주간 예보 */}
-      <div>
-        <h3 className="text-sm font-semibold text-gray-200 mb-3">
-          주간 예보
-        </h3>
-        <div className="space-y-2">
-          {forecast.slice(0, 5).map((day, index) => {
-            const date = new Date(day.date);
-            const dayName = index === 0 ? '오늘' : ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
+        {/* Weather Details - 세로 구분선 + 중앙 */}
+        <div className="h-32 w-px bg-white/20" />
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">💧</span>
+            <div>
+              <div className="text-xs text-gray-400">습도</div>
+              <div className="text-2xl font-semibold text-white">{weather.humidity}%</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">💨</span>
+            <div>
+              <div className="text-xs text-gray-400">풍속</div>
+              <div className="text-2xl font-semibold text-white">{weather.windSpeed}m/s</div>
+            </div>
+          </div>
+        </div>
 
-            return (
-              <div
-                key={day.date}
-                className="flex items-center justify-between bg-white/10 rounded-lg p-3"
-              >
-                <div className="flex items-center gap-3 flex-1">
-                  <span className="text-sm font-medium text-gray-200 w-8">
-                    {dayName}
-                  </span>
-                  <img
-                    src={`https://openweathermap.org/img/wn/${day.conditionIcon}.png`}
-                    alt={day.condition}
-                    className="w-8 h-8"
-                  />
-                  <span className="text-sm text-gray-300">
-                    {day.condition}
-                  </span>
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* 5-Day Forecast - Right */}
+        <div className="w-52 flex flex-col flex-shrink-0 mr-8">
+          <h3 className="text-sm font-semibold text-gray-300 mb-2">5일 예보</h3>
+          <div className="flex-1 flex flex-col justify-around">
+            {forecast.slice(0, 5).map((day, index) => {
+              const date = new Date(day.date);
+              const dayName = index === 0 ? '오늘' : ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
+
+              return (
+                <div
+                  key={day.date}
+                  className="flex items-center justify-between bg-white/5 rounded-lg px-3 py-1"
+                >
+                  <span className="text-sm text-gray-300 w-8 font-medium">{dayName}</span>
+                  <span className="text-lg">{getWeatherEmoji(day.conditionIcon)}</span>
+                  <div className="text-sm text-right">
+                    <span className="text-blue-300 font-bold">{day.maxTemp}°</span>
+                    <span className="text-gray-500 mx-0.5">/</span>
+                    <span className="text-gray-400">{day.minTemp}°</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-blue-300">
-                    {day.maxTemp}°
-                  </span>
-                  <span className="text-sm text-gray-400">
-                    {day.minTemp}°
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
-
-      {/* 업데이트 시간 */}
-      <div className="mt-4 text-xs text-gray-400 text-center">
-        마지막 업데이트: {weather.updatedAt.toLocaleTimeString('ko-KR')}
       </div>
     </div>
   );

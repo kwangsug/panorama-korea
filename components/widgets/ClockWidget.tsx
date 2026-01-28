@@ -1,121 +1,349 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { getCurrentWeather, type WeatherData, type CityName } from '@/lib/api/weather';
+
+interface TickerItem {
+  type: 'news' | 'job';
+  title: string;
+  source?: string; // RSS 피드 제목
+}
 
 interface FlipCardProps {
   value: string;
-  label?: string;
 }
 
-function FlipCard({ value, label }: FlipCardProps) {
-  const [prevValue, setPrevValue] = useState(value);
+function FlipCard({ value }: FlipCardProps) {
+  const [currentValue, setCurrentValue] = useState(value);
+  const [previousValue, setPreviousValue] = useState(value);
   const [isFlipping, setIsFlipping] = useState(false);
 
   useEffect(() => {
-    if (value !== prevValue) {
+    if (value !== currentValue) {
+      setPreviousValue(currentValue);
       setIsFlipping(true);
+
       const timer = setTimeout(() => {
-        setPrevValue(value);
-        setIsFlipping(false);
+        setCurrentValue(value);
       }, 300);
-      return () => clearTimeout(timer);
+
+      const endTimer = setTimeout(() => {
+        setIsFlipping(false);
+      }, 600);
+
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(endTimer);
+      };
     }
-  }, [value, prevValue]);
+  }, [value, currentValue]);
+
+  const textClass = "text-5xl md:text-6xl lg:text-7xl text-white tabular-nums font-bold";
+  const fontStyle = { fontFamily: 'var(--font-bebas), system-ui' };
 
   return (
-    <div className="relative">
-      {label && (
-        <div className="text-xs text-gray-400 text-center mb-1 font-medium">
-          {label}
+    <div className="relative w-16 h-20 md:w-20 md:h-24 lg:w-24 lg:h-28" style={{ perspective: '200px' }}>
+      {/* 하단 고정 패널 */}
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-slate-800 to-slate-900 rounded-b-lg border-x border-b border-white/20 overflow-hidden">
+        <div className="absolute inset-0 flex items-start justify-center">
+          <span className={textClass} style={{ ...fontStyle, transform: 'translateY(-50%)' }}>
+            {currentValue}
+          </span>
         </div>
-      )}
-      <div className="relative w-20 h-28 perspective-1000">
-        <div
-          className={`absolute w-full h-full transition-transform duration-300 transform-style-3d ${
-            isFlipping ? 'animate-flip' : ''
-          }`}
-        >
-          {/* Front */}
-          <div className="absolute w-full h-full backface-hidden bg-gradient-to-b from-slate-800 to-slate-900 rounded-xl border border-white/10 shadow-2xl flex items-center justify-center">
-            <span className="text-6xl font-bold text-white tabular-nums">
-              {value}
-            </span>
-          </div>
-          {/* Back */}
-          <div className="absolute w-full h-full backface-hidden bg-gradient-to-b from-slate-700 to-slate-800 rounded-xl border border-white/20 shadow-2xl flex items-center justify-center rotate-x-180">
-            <span className="text-6xl font-bold text-white/90 tabular-nums">
-              {prevValue}
-            </span>
-          </div>
-        </div>
-        {/* Card shine effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-xl pointer-events-none" />
       </div>
+
+      {/* 상단 고정 패널 */}
+      <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-slate-600 to-slate-700 rounded-t-lg border-x border-t border-white/20 overflow-hidden">
+        <div className="absolute inset-0 flex items-end justify-center">
+          <span className={textClass} style={{ ...fontStyle, transform: 'translateY(50%)' }}>
+            {currentValue}
+          </span>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
+      </div>
+
+      {/* 플립되는 상단 패널 */}
+      <div
+        className="absolute inset-x-0 top-0 h-1/2 origin-bottom"
+        style={{
+          transformStyle: 'preserve-3d',
+          transform: isFlipping ? 'rotateX(-180deg)' : 'rotateX(0deg)',
+          transition: 'transform 0.6s ease-in-out',
+          zIndex: isFlipping ? 10 : 1,
+        }}
+      >
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-slate-600 to-slate-700 rounded-t-lg border-x border-t border-white/20 overflow-hidden"
+          style={{ backfaceVisibility: 'hidden' }}
+        >
+          <div className="absolute inset-0 flex items-end justify-center">
+            <span className={textClass} style={{ ...fontStyle, transform: 'translateY(50%)' }}>
+              {previousValue}
+            </span>
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
+        </div>
+
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-slate-900 to-slate-800 rounded-b-lg border-x border-b border-white/20 overflow-hidden"
+          style={{
+            backfaceVisibility: 'hidden',
+            transform: 'rotateX(180deg)',
+          }}
+        >
+          <div className="absolute inset-0 flex items-start justify-center">
+            <span className={textClass} style={{ ...fontStyle, transform: 'translateY(-50%)' }}>
+              {currentValue}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute inset-x-0 top-1/2 h-[2px] bg-black/60 z-20 -translate-y-1/2" />
+      <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-r from-black/20 to-transparent pointer-events-none z-20" />
+      <div className="absolute inset-y-0 right-0 w-1 bg-gradient-to-l from-black/20 to-transparent pointer-events-none z-20" />
     </div>
   );
 }
 
 function Separator() {
   return (
-    <div className="flex flex-col items-center justify-center h-28 pb-6">
-      <div className="text-5xl font-bold text-white/80">:</div>
+    <div className="flex items-center justify-center h-20 md:h-24 lg:h-28 px-1">
+      <span className="text-3xl md:text-4xl lg:text-5xl font-bold text-white/50">:</span>
     </div>
   );
 }
 
+// HTML 엔티티 디코딩
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'");
+}
+
+// 날씨 아이콘 이모지 (WeatherWidget과 통일)
+function getWeatherEmoji(iconCode: string): string {
+  const emojiMap: Record<string, string> = {
+    '01d': '☀️', '01n': '🌙',
+    '02d': '⛅', '02n': '☁️',
+    '03d': '☁️', '03n': '☁️',
+    '04d': '☁️', '04n': '☁️',
+    '09d': '🌧️', '09n': '🌧️',
+    '10d': '🌦️', '10n': '🌧️',
+    '11d': '⛈️', '11n': '⛈️',
+    '13d': '❄️', '13n': '❄️',
+    '50d': '🌫️', '50n': '🌫️',
+  };
+  return emojiMap[iconCode] || '☀️';
+}
+
 export function ClockWidget() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [tickerItems, setTickerItems] = useState<TickerItem[]>([]);
+  const [tickerIndex, setTickerIndex] = useState(0);
+  const [selectedCity, setSelectedCity] = useState<CityName>('Seoul');
+  const [scrollAmount, setScrollAmount] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+
+  // 설정에서 선택된 도시 로드
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('panorama-settings');
+    if (savedSettings) {
+      try {
+        const settings = JSON.parse(savedSettings);
+        if (settings.selectedCity) {
+          setSelectedCity(settings.selectedCity);
+        }
+      } catch (error) {
+        console.error('설정 로드 실패:', error);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const loadWeather = async () => {
+      try {
+        const data = await getCurrentWeather(selectedCity);
+        setWeather(data);
+      } catch (error) {
+        console.error('날씨 로딩 실패:', error);
+      }
+    };
+    loadWeather();
+    // 30분마다 자동 업데이트
+    const interval = setInterval(loadWeather, 1800000);
+    return () => clearInterval(interval);
+  }, [selectedCity]);
+
+  // 뉴스와 채용정보 로드 (20개까지 로컬 저장)
+  useEffect(() => {
+    const loadTickerData = async () => {
+      try {
+        const [newsRes, jobsRes] = await Promise.all([
+          fetch('/api/news'),
+          fetch(`/api/jobs?city=${selectedCity}`),
+        ]);
+        const newsData = await newsRes.json();
+        const jobsData = await jobsRes.json();
+
+        const items: TickerItem[] = [];
+
+        // 뉴스 제목 추출 (최대 10개)
+        const newsItems: TickerItem[] = [];
+        if (newsData.news) {
+          newsData.news.slice(0, 10).forEach((article: { title: string }) => {
+            newsItems.push({ type: 'news', title: decodeHtmlEntities(article.title), source: '뉴스' });
+          });
+        }
+
+        // 채용정보 제목 추출 (최대 10개) - 기업명 포함
+        const jobItems: TickerItem[] = [];
+        if (jobsData.jobs) {
+          jobsData.jobs.slice(0, 10).forEach((job: { title: string; company: string }) => {
+            const decodedTitle = decodeHtmlEntities(job.title);
+            const decodedCompany = decodeHtmlEntities(job.company);
+            // 기업명 + 제목 형태로 표시
+            jobItems.push({ type: 'job', title: `${decodedCompany} - ${decodedTitle}`, source: '채용' });
+          });
+        }
+
+        // 뉴스와 채용정보 번갈아 배치 (뉴스 하나, 채용 하나...)
+        const maxLen = Math.max(newsItems.length, jobItems.length);
+        for (let i = 0; i < maxLen; i++) {
+          if (i < newsItems.length) items.push(newsItems[i]);
+          if (i < jobItems.length) items.push(jobItems[i]);
+        }
+
+        // 20개까지 로컬 저장
+        const itemsToSave = items.slice(0, 20);
+        localStorage.setItem('clock-ticker-items', JSON.stringify(itemsToSave));
+        setTickerItems(itemsToSave);
+      } catch (error) {
+        console.error('티커 데이터 로딩 실패:', error);
+        // 로컬 저장된 데이터 로드
+        const saved = localStorage.getItem('clock-ticker-items');
+        if (saved) {
+          setTickerItems(JSON.parse(saved));
+        }
+      }
+    };
+
+    // 초기 로드 시 로컬 데이터 먼저 표시
+    const saved = localStorage.getItem('clock-ticker-items');
+    if (saved) {
+      setTickerItems(JSON.parse(saved));
+    }
+
+    loadTickerData();
+    // 1분마다 갱신
+    const interval = setInterval(loadTickerData, 60000);
+    return () => clearInterval(interval);
+  }, [selectedCity]);
+
+  // 티커 자동 전환 (10초)
+  useEffect(() => {
+    if (tickerItems.length === 0) return;
+    const interval = setInterval(() => {
+      setScrollAmount(0);
+      setTickerIndex((prev) => (prev + 1) % tickerItems.length);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [tickerItems.length]);
+
+  // 2초 후 스크롤 시작 (텍스트가 잘린 경우에만)
+  useEffect(() => {
+    setScrollAmount(0);
+    const timer = setTimeout(() => {
+      if (containerRef.current && textRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const textWidth = textRef.current.scrollWidth;
+        // 텍스트가 컨테이너보다 긴 경우에만 스크롤
+        if (textWidth > containerWidth) {
+          setScrollAmount(textWidth - containerWidth + 20); // 20px 여유
+        }
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [tickerIndex]);
 
   const hours = currentTime.getHours().toString().padStart(2, '0');
   const minutes = currentTime.getMinutes().toString().padStart(2, '0');
   const seconds = currentTime.getSeconds().toString().padStart(2, '0');
 
   return (
-    <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 hover:bg-white/15 transition-all border border-white/20">
-      {/* 헤더 */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-indigo-500/30 rounded-full flex items-center justify-center backdrop-blur-sm">
-          <span className="text-2xl">🕐</span>
-        </div>
-        <h2 className="text-2xl font-semibold text-white">시계</h2>
-      </div>
-
-      {/* Flip Clock Display */}
-      <div className="flex items-center justify-center gap-3 mb-6">
-        {/* Hours */}
-        <FlipCard value={hours[0]} label="시" />
+    <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-4 md:p-6 border border-white/10 flex flex-col justify-center">
+      {/* 시계 - 플립 카드 */}
+      <div className="flex items-center justify-center gap-1 md:gap-2 mb-4 md:mb-6">
+        <FlipCard value={hours[0]} />
         <FlipCard value={hours[1]} />
-
         <Separator />
-
-        {/* Minutes */}
-        <FlipCard value={minutes[0]} label="분" />
+        <FlipCard value={minutes[0]} />
         <FlipCard value={minutes[1]} />
-
         <Separator />
-
-        {/* Seconds */}
-        <FlipCard value={seconds[0]} label="초" />
+        <FlipCard value={seconds[0]} />
         <FlipCard value={seconds[1]} />
       </div>
 
-      {/* Date Display */}
-      <div className="text-center text-lg text-gray-300">
-        {currentTime.toLocaleDateString('ko-KR', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          weekday: 'long'
-        })}
+      {/* 날짜와 날씨 */}
+      <div className="flex items-center justify-between px-2">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="text-base md:text-xl text-white font-medium">
+            {currentTime.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}
+          </div>
+          <div className="text-sm md:text-lg text-gray-400">
+            {currentTime.toLocaleDateString('ko-KR', { weekday: 'long' })}
+          </div>
+        </div>
+
+        {weather && (
+          <div className="flex items-center gap-2">
+            <span className="text-2xl md:text-3xl">{getWeatherEmoji(weather.conditionIcon)}</span>
+            <div className="text-xl md:text-2xl text-white font-bold">{weather.temperature}°</div>
+          </div>
+        )}
       </div>
+
+      {/* 뉴스/채용정보 티커 (한 줄) */}
+      {tickerItems.length > 0 && (
+        <div className="mt-3 pt-3 border-t border-white/10 overflow-hidden h-9">
+          <div
+            key={tickerIndex}
+            className="flex items-center gap-2 animate-[slideUp_0.4s_ease-out]"
+          >
+            <span className={`text-xs px-2 py-0.5 rounded flex-shrink-0 ${
+              tickerItems[tickerIndex].type === 'news'
+                ? 'bg-purple-500/30 text-purple-300'
+                : 'bg-orange-500/30 text-orange-300'
+            }`}>
+              {tickerItems[tickerIndex].type === 'news' ? '뉴스' : '채용'}
+            </span>
+            <div ref={containerRef} className="flex-1 overflow-hidden">
+              <span
+                ref={textRef}
+                className="text-sm text-gray-300 whitespace-nowrap inline-block transition-transform duration-[6000ms] ease-linear"
+                style={{
+                  transform: scrollAmount > 0 ? `translateX(-${scrollAmount}px)` : 'translateX(0)',
+                }}
+              >
+                {tickerItems[tickerIndex].title}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
