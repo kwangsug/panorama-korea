@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { getNews, getMockNews } from '@/lib/api/news';
+import { getMockNews } from '@/lib/api/news';
 import type { NewsItem } from '@/types';
 
 interface NewsWidgetProps {
@@ -12,6 +12,7 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [newsSource, setNewsSource] = useState<'naver' | 'yonhap' | 'google'>('naver');
+  const [isMock, setIsMock] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -46,9 +47,11 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
       }
       const data = await response.json();
       setNews(data.news || []);
+      setIsMock(data.source === 'mock');
     } catch (error) {
       console.error('뉴스 로딩 실패:', error);
       setNews(getMockNews());
+      setIsMock(true);
     } finally {
       setLoading(false);
     }
@@ -210,7 +213,17 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
             <span className="text-lg">📰</span>
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-white">주요 뉴스</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-white">주요 뉴스</h2>
+              {isMock && (
+                <span
+                  className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30"
+                  title="실시간 뉴스를 불러오지 못해 샘플을 표시 중입니다 — 네이버 API 키 또는 네트워크를 확인하세요"
+                >
+                  📡 샘플
+                </span>
+              )}
+            </div>
             <p className="text-xs text-gray-400">
               {newsSource === 'naver' ? '네이버' : newsSource === 'yonhap' ? '연합' : '구글'} 뉴스
             </p>

@@ -45,7 +45,7 @@ export async function GET(request: Request) {
   }
 
   // 네이버 뉴스 요청 처리
-  return handleNaverNews(source, city);
+  return handleNaverNews(city);
 }
 
 /**
@@ -162,9 +162,11 @@ async function handleYonhapRSS() {
 /**
  * 네이버 뉴스 검색 API
  */
-async function handleNaverNews(source: string, city: string) {
-  const clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
-  const clientSecret = process.env.NEXT_PUBLIC_NAVER_CLIENT_SECRET;
+async function handleNaverNews(city: string) {
+  // 네이버 키는 server-only로 변경 (NEXT_PUBLIC_ 접두사는 브라우저 번들에 시크릿 노출됨)
+  // 하위 호환을 위해 NEXT_PUBLIC_*도 fallback으로 한 번 더 본다.
+  const clientId = process.env.NAVER_CLIENT_ID || process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
+  const clientSecret = process.env.NAVER_CLIENT_SECRET || process.env.NEXT_PUBLIC_NAVER_CLIENT_SECRET;
 
   // API 키가 없으면 목업 데이터 반환
   if (!clientId || !clientSecret) {

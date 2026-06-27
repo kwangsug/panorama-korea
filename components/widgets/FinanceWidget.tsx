@@ -19,6 +19,7 @@ export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
   const [markets, setMarkets] = useState<FinanceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isMock, setIsMock] = useState(false);
 
   // 금융 데이터 로드
   useEffect(() => {
@@ -30,8 +31,10 @@ export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
         }
         const data = await response.json();
         setMarkets(data.markets || []);
+        setIsMock(data.source === 'mock');
       } catch (error) {
         console.error('금융 데이터 로딩 실패:', error);
+        setIsMock(true);
       } finally {
         setLoading(false);
       }
@@ -97,15 +100,6 @@ export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
     }
   };
 
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case 'stock': return '주식';
-      case 'crypto': return '암호화폐';
-      case 'currency': return '환율';
-      default: return '시장';
-    }
-  };
-
   return (
     <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col">
       {/* Header */}
@@ -114,6 +108,14 @@ export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
           <span className="text-lg">💹</span>
         </div>
         <h2 className="text-lg font-semibold text-white">금융 시장</h2>
+        {isMock && (
+          <span
+            className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30"
+            title="실시간 데이터를 불러오지 못해 샘플 값을 표시 중입니다"
+          >
+            📡 샘플
+          </span>
+        )}
         {markets.length > 1 && (
           <div className="ml-auto text-sm text-gray-400">
             {currentIndex + 1} / {markets.length}

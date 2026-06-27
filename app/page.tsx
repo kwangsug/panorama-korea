@@ -7,7 +7,6 @@ import { NewsWidget } from '@/components/widgets/NewsWidget';
 import { JobWidget } from '@/components/widgets/JobWidget';
 import { CalendarWidget } from '@/components/widgets/CalendarWidget';
 import { FinanceWidget } from '@/components/widgets/FinanceWidget';
-import { MAJOR_CITIES, type CityName } from '@/lib/api/weather';
 
 type ContentView = 'weather' | 'news' | 'jobs' | 'calendar' | 'finance';
 
@@ -49,9 +48,6 @@ export default function Home() {
   const [newsRotationSeconds, setNewsRotationSeconds] = useState(15);
   const [jobRotationSeconds, setJobRotationSeconds] = useState(10);
   const [serpApiKey, setSerpApiKey] = useState<string>('');
-  const [financeDataSources, setFinanceDataSources] = useState<string[]>([
-    'https://serpapi.com/search?engine=google_finance'
-  ]);
   const [calendarSources, setCalendarSources] = useState<Array<{
     id: string;
     url: string;
@@ -80,7 +76,6 @@ export default function Home() {
         if (settings.newsRotationSeconds) setNewsRotationSeconds(settings.newsRotationSeconds);
         if (settings.jobRotationSeconds) setJobRotationSeconds(settings.jobRotationSeconds);
         if (settings.serpApiKey) setSerpApiKey(settings.serpApiKey);
-        if (settings.financeDataSources) setFinanceDataSources(settings.financeDataSources);
         if (settings.calendarSources) setCalendarSources(settings.calendarSources);
       } catch (e) {
         console.error('설정 로드 실패:', e);
@@ -144,7 +139,6 @@ export default function Home() {
   const handlePointerUp = (e: React.PointerEvent) => {
     const diffX = touchStart.x - e.clientX;
     const diffY = touchStart.y - e.clientY;
-    const screenWidth = window.innerWidth;
 
     // 왼쪽 가장자리에서 오른쪽으로 스와이프 → 설정 열기
     if (touchStart.x < 100 && diffX < -30) {
@@ -222,16 +216,31 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden flex items-center justify-center">
-      {/* Dashboard Container - 32:9 Aspect Ratio (1920x540) */}
-      <div className="w-full max-w-[1920px] aspect-[32/9] p-4 md:p-6 mx-auto flex gap-4 md:gap-5">
-        {/* Clock Widget - 왼쪽 (45% - 황금비 근사) */}
-        <div className="w-[45%] flex-shrink-0 h-full">
+      {/*
+        Dashboard Container — 반응형:
+        - portrait/mobile : 세로 스택 (시계 위 35%, 콘텐츠 아래 65%), 전체 화면 채움
+        - landscape       : 가로 분할 (시계 좌 45%, 콘텐츠 우 55%), 전체 화면 채움
+        - 32:9 와이드     : 1920x540 aspect ratio 유지 (super-wide display 전용)
+      */}
+      <div
+        className="
+          w-full h-screen mx-auto flex
+          flex-col landscape:flex-row
+          gap-3 p-3 sm:gap-4 sm:p-4 md:gap-5 md:p-6
+          landscape:max-w-[1920px]
+          landscape:[@media(min-aspect-ratio:32/9)]:aspect-[32/9]
+          landscape:[@media(min-aspect-ratio:32/9)]:max-h-[540px]
+          landscape:[@media(min-aspect-ratio:32/9)]:h-auto
+        "
+      >
+        {/* Clock Widget — portrait: 위 35% / landscape: 좌 45% */}
+        <div className="w-full landscape:w-[45%] h-[35%] landscape:h-full flex-shrink-0 min-h-0">
           <ClockWidget />
         </div>
 
-        {/* Content Area - 오른쪽 (55% - 황금비 근사) */}
+        {/* Content Area — portrait: 아래 65% / landscape: 우 55% */}
         <div
-          className="w-[55%] flex-shrink-0 h-full relative overflow-hidden"
+          className="w-full landscape:w-[55%] h-[65%] landscape:h-full flex-shrink-0 min-h-0 relative overflow-hidden"
           style={{ perspective: '1200px' }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
