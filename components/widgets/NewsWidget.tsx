@@ -3,6 +3,15 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getMockNews } from '@/lib/api/news';
 import type { NewsItem } from '@/types';
+import { WidgetCard } from '@/components/ui/WidgetCard';
+import { WidgetHeader } from '@/components/ui/WidgetHeader';
+
+type NewsSourceKey = 'naver' | 'yonhap' | 'google';
+const SOURCE_LABEL: Record<NewsSourceKey, string> = {
+  naver: '네이버',
+  yonhap: '연합',
+  google: '구글',
+};
 
 interface NewsWidgetProps {
   rotationSeconds?: number;
@@ -11,7 +20,7 @@ interface NewsWidgetProps {
 export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newsSource, setNewsSource] = useState<'naver' | 'yonhap' | 'google'>('naver');
+  const [newsSource, setNewsSource] = useState<NewsSourceKey>('naver');
   const [isMock, setIsMock] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
@@ -168,19 +177,22 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
     return `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(url)}`;
   }
 
+  // 소스 변경 핸들러 — 3개 버튼이 동일 로직 중복하던 것 통합
+  const changeSource = (next: NewsSourceKey) => {
+    setLoading(true);
+    setNewsSource(next);
+    const prev = JSON.parse(localStorage.getItem('panorama-settings') || '{}');
+    localStorage.setItem('panorama-settings', JSON.stringify({ ...prev, newsSource: next }));
+  };
+
   if (loading) {
     return (
-      <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 bg-green-500/30 rounded-full flex items-center justify-center">
-            <span className="text-lg">📰</span>
-          </div>
-          <h2 className="text-lg font-semibold text-white">뉴스</h2>
-        </div>
+      <WidgetCard>
+        <WidgetHeader icon="📰" title="뉴스" accent="news" />
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-pulse text-gray-400">뉴스 로딩 중...</div>
         </div>
-      </div>
+      </WidgetCard>
     );
   }
 
@@ -199,91 +211,35 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
   };
 
   return (
-    <div
-      className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col overflow-hidden"
+    <WidgetCard
+      className="overflow-hidden"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerLeave={() => { setIsDragging(false); setDragX(0); }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-green-500/30 rounded-full flex items-center justify-center">
-            <span className="text-lg">📰</span>
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold text-white">주요 뉴스</h2>
-              {isMock && (
-                <span
-                  className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30"
-                  title="실시간 뉴스를 불러오지 못해 샘플을 표시 중입니다 — 네이버 API 키 또는 네트워크를 확인하세요"
-                >
-                  📡 샘플
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-gray-400">
-              {newsSource === 'naver' ? '네이버' : newsSource === 'yonhap' ? '연합' : '구글'} 뉴스
-            </p>
-          </div>
-        </div>
-        {/* 뉴스 소스 선택 버튼 */}
-        <div className="flex gap-1">
+      <WidgetHeader
+        icon="📰"
+        title="주요 뉴스"
+        accent="news"
+        subtitle={`${SOURCE_LABEL[newsSource]} 뉴스`}
+        isMock={isMock}
+        mockTooltip="실시간 뉴스를 불러오지 못해 샘플을 표시 중입니다 — 네이버 API 키 또는 네트워크를 확인하세요"
+      >
+        {(['naver', 'yonhap', 'google'] as const).map((key) => (
           <button
-            onClick={() => {
-              setLoading(true);
-              setNewsSource('naver');
-              localStorage.setItem('panorama-settings', JSON.stringify({
-                ...JSON.parse(localStorage.getItem('panorama-settings') || '{}'),
-                newsSource: 'naver'
-              }));
-            }}
+            key={key}
+            onClick={() => changeSource(key)}
             className={`px-2 py-1 rounded text-xs transition-colors ${
-              newsSource === 'naver'
+              newsSource === key
                 ? 'bg-green-500/30 text-green-300'
                 : 'bg-white/10 text-gray-400 hover:bg-white/20'
             }`}
           >
-            네이버
+            {SOURCE_LABEL[key]}
           </button>
-          <button
-            onClick={() => {
-              setLoading(true);
-              setNewsSource('yonhap');
-              localStorage.setItem('panorama-settings', JSON.stringify({
-                ...JSON.parse(localStorage.getItem('panorama-settings') || '{}'),
-                newsSource: 'yonhap'
-              }));
-            }}
-            className={`px-2 py-1 rounded text-xs transition-colors ${
-              newsSource === 'yonhap'
-                ? 'bg-green-500/30 text-green-300'
-                : 'bg-white/10 text-gray-400 hover:bg-white/20'
-            }`}
-          >
-            연합
-          </button>
-          <button
-            onClick={() => {
-              setLoading(true);
-              setNewsSource('google');
-              localStorage.setItem('panorama-settings', JSON.stringify({
-                ...JSON.parse(localStorage.getItem('panorama-settings') || '{}'),
-                newsSource: 'google'
-              }));
-            }}
-            className={`px-2 py-1 rounded text-xs transition-colors ${
-              newsSource === 'google'
-                ? 'bg-green-500/30 text-green-300'
-                : 'bg-white/10 text-gray-400 hover:bg-white/20'
-            }`}
-          >
-            구글
-          </button>
-        </div>
-      </div>
+        ))}
+      </WidgetHeader>
 
       {/* Single News Item - 앱처럼 스와이프 효과 */}
       <div
@@ -349,6 +305,6 @@ export function NewsWidget({ rotationSeconds = 15 }: NewsWidgetProps) {
           />
         ))}
       </div>
-    </div>
+    </WidgetCard>
   );
 }

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { WidgetCard } from '@/components/ui/WidgetCard';
+import { WidgetHeader } from '@/components/ui/WidgetHeader';
 
 interface FinanceItem {
   symbol: string;
@@ -14,6 +16,9 @@ interface FinanceItem {
 interface FinanceWidgetProps {
   rotationSeconds?: number;
 }
+
+const HEADER_ICON = '💹';
+const HEADER_TITLE = '금융 시장';
 
 export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
   const [markets, setMarkets] = useState<FinanceItem[]>([]);
@@ -57,33 +62,23 @@ export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
 
   if (loading) {
     return (
-      <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 bg-green-500/30 rounded-full flex items-center justify-center">
-            <span className="text-lg">💹</span>
-          </div>
-          <h2 className="text-lg font-semibold text-white">금융 시장</h2>
-        </div>
+      <WidgetCard>
+        <WidgetHeader icon={HEADER_ICON} title={HEADER_TITLE} accent="finance" />
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-pulse text-gray-400">시장 정보 로딩 중...</div>
         </div>
-      </div>
+      </WidgetCard>
     );
   }
 
   if (markets.length === 0) {
     return (
-      <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 bg-green-500/30 rounded-full flex items-center justify-center">
-            <span className="text-lg">💹</span>
-          </div>
-          <h2 className="text-lg font-semibold text-white">금융 시장</h2>
-        </div>
+      <WidgetCard>
+        <WidgetHeader icon={HEADER_ICON} title={HEADER_TITLE} accent="finance" isMock />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-gray-400 text-xl">시장 데이터를 불러올 수 없습니다</div>
         </div>
-      </div>
+      </WidgetCard>
     );
   }
 
@@ -101,34 +96,21 @@ export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
   };
 
   return (
-    <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col">
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-8 h-8 bg-green-500/30 rounded-full flex items-center justify-center">
-          <span className="text-lg">💹</span>
-        </div>
-        <h2 className="text-lg font-semibold text-white">금융 시장</h2>
-        {isMock && (
-          <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30"
-            title="실시간 데이터를 불러오지 못해 샘플 값을 표시 중입니다"
-          >
-            📡 샘플
+    <WidgetCard>
+      <WidgetHeader icon={HEADER_ICON} title={HEADER_TITLE} accent="finance" isMock={isMock}>
+        {markets.length > 1 && (
+          <span className="text-sm text-gray-400">
+            {currentIndex + 1} / {markets.length}
           </span>
         )}
-        {markets.length > 1 && (
-          <div className="ml-auto text-sm text-gray-400">
-            {currentIndex + 1} / {markets.length}
-          </div>
-        )}
-      </div>
+      </WidgetHeader>
 
       {/* Market Content - 2 Column Layout */}
       <div className="flex-1 flex gap-6">
         {/* Left: Main Stock */}
         {markets.length > 0 && (
           <div className="flex-1 flex flex-col justify-center">
-            <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/10 backdrop-blur-sm rounded-3xl shadow-2xl border border-green-500/30 p-4 md:p-6 lg:p-8">
+            <div className="bg-gradient-to-br from-amber-500/20 to-amber-500/5 backdrop-blur-sm rounded-3xl shadow-2xl border border-amber-500/30 p-4 md:p-6 lg:p-8">
               <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
                 <span className="text-[3vw] md:text-[2.5vw]">{getTypeIcon(markets[0].type)}</span>
                 <div className="flex-1">
@@ -140,7 +122,11 @@ export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
                 <div className="text-[4vw] md:text-[3.5vw] font-bold text-white">{markets[0].price}</div>
                 <div
                   className={`flex items-center gap-2 md:gap-3 px-3 md:px-4 py-1 md:py-2 rounded-xl ${
-                    isPositive ? 'bg-green-500/30 text-green-300' : isNegative ? 'bg-red-500/30 text-red-300' : 'bg-gray-500/30 text-gray-300'
+                    isPositive
+                      ? 'bg-green-500/30 text-green-300'
+                      : isNegative
+                      ? 'bg-red-500/30 text-red-300'
+                      : 'bg-gray-500/30 text-gray-300'
                   }`}
                 >
                   <span className="text-[2vw] md:text-[1.8vw]">{isPositive ? '▲' : isNegative ? '▼' : '—'}</span>
@@ -161,7 +147,7 @@ export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
                 return (
                   <div
                     key={idx}
-                    className="bg-white/5 rounded-xl p-3 md:p-4 border border-white/10 hover:border-green-400/30 transition-all"
+                    className="bg-white/5 rounded-xl p-3 md:p-4 border border-white/10 hover:border-amber-400/30 transition-all"
                   >
                     <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
                       <span className="text-[1.5vw] md:text-[1.2vw]">{getTypeIcon(market.type)}</span>
@@ -174,7 +160,11 @@ export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
                       <div className="text-[1.2vw] md:text-[1vw] font-bold text-white">{market.price}</div>
                       <div
                         className={`flex items-center gap-1 md:gap-2 px-2 py-0.5 md:py-1 rounded-lg ${
-                          isPos ? 'bg-green-500/20 text-green-400' : isNeg ? 'bg-red-500/20 text-red-400' : 'bg-gray-500/20 text-gray-400'
+                          isPos
+                            ? 'bg-green-500/20 text-green-400'
+                            : isNeg
+                            ? 'bg-red-500/20 text-red-400'
+                            : 'bg-gray-500/20 text-gray-400'
                         }`}
                       >
                         <span className="text-[0.8vw] md:text-[0.7vw]">{isPos ? '▲' : isNeg ? '▼' : '—'}</span>
@@ -196,12 +186,12 @@ export function FinanceWidget({ rotationSeconds = 10 }: FinanceWidgetProps) {
             <div
               key={idx}
               className={`h-1 rounded-full transition-all ${
-                idx === currentIndex ? 'w-4 bg-green-400' : 'w-1 bg-white/20'
+                idx === currentIndex ? 'w-4 bg-amber-400' : 'w-1 bg-white/20'
               }`}
             />
           ))}
         </div>
       )}
-    </div>
+    </WidgetCard>
   );
 }

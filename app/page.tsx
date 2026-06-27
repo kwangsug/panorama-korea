@@ -7,10 +7,24 @@ import { NewsWidget } from '@/components/widgets/NewsWidget';
 import { JobWidget } from '@/components/widgets/JobWidget';
 import { CalendarWidget } from '@/components/widgets/CalendarWidget';
 import { FinanceWidget } from '@/components/widgets/FinanceWidget';
+import { PageIndicator } from '@/components/ui/PageIndicator';
 
 type ContentView = 'weather' | 'news' | 'jobs' | 'calendar' | 'finance';
 
 const VIEWS: ContentView[] = ['weather', 'news', 'jobs', 'calendar', 'finance'];
+
+/**
+ * 위젯별 액센트 색 — 5뷰 순환에서 한눈에 구분 가능하도록 5색 차별.
+ * globals.css의 디자인 토큰(`--accent-*`)과 1:1 대응.
+ * finance는 amber로 변경 — 기존엔 news와 같은 green이라 인디케이터가 혼동됨.
+ */
+const VIEW_ACCENT: Record<ContentView, string> = {
+  weather: 'bg-blue-400',
+  news: 'bg-green-400',
+  jobs: 'bg-orange-400',
+  calendar: 'bg-purple-400',
+  finance: 'bg-amber-400',
+};
 
 const CITIES: Record<string, string> = {
   Seoul: '서울',
@@ -317,34 +331,17 @@ export default function Home() {
             <FinanceWidget rotationSeconds={10} />
           </div>
 
-          {/* Vertical Page Indicator - Inside Widget */}
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-10">
-            <div
-              className={`w-2 rounded-full transition-all duration-300 ${
-                currentView === 'weather' ? 'bg-blue-400 h-6' : 'bg-white/30 h-2'
-              }`}
-            />
-            <div
-              className={`w-2 rounded-full transition-all duration-300 ${
-                currentView === 'news' ? 'bg-green-400 h-6' : 'bg-white/30 h-2'
-              }`}
-            />
-            <div
-              className={`w-2 rounded-full transition-all duration-300 ${
-                currentView === 'jobs' ? 'bg-orange-400 h-6' : 'bg-white/30 h-2'
-              }`}
-            />
-            <div
-              className={`w-2 rounded-full transition-all duration-300 ${
-                currentView === 'calendar' ? 'bg-purple-400 h-6' : 'bg-white/30 h-2'
-              }`}
-            />
-            <div
-              className={`w-2 rounded-full transition-all duration-300 ${
-                currentView === 'finance' ? 'bg-green-400 h-6' : 'bg-white/30 h-2'
-              }`}
-            />
-          </div>
+          {/*
+            Vertical Page Indicator — Phase 3 통일.
+            VIEWS 배열 + VIEW_ACCENT 맵 한 곳만 수정하면 자동 동기화 (기존: 5곳 중복).
+            finance 색을 amber로 변경 — news와 충돌 해소.
+          */}
+          <PageIndicator
+            items={VIEWS.map((key) => ({ key, accent: VIEW_ACCENT[key] }))}
+            currentKey={currentView}
+            orientation="vertical"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-10"
+          />
         </div>
       </div>
 

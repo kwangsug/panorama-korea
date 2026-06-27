@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { getCurrentWeather, getWeatherForecast, type WeatherData, type WeatherForecast, type CityName } from '@/lib/api/weather';
+import { WidgetCard } from '@/components/ui/WidgetCard';
+import { WidgetHeader } from '@/components/ui/WidgetHeader';
 
 export function WeatherWidget() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -47,17 +49,12 @@ export function WeatherWidget() {
 
   if (loading || !weather) {
     return (
-      <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 bg-blue-500/30 rounded-full flex items-center justify-center">
-            <span className="text-lg">☀️</span>
-          </div>
-          <h2 className="text-lg font-semibold text-white">날씨</h2>
-        </div>
+      <WidgetCard>
+        <WidgetHeader icon="☀️" title="날씨" accent="weather" />
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-pulse text-gray-400">날씨 로딩 중...</div>
         </div>
-      </div>
+      </WidgetCard>
     );
   }
 
@@ -78,22 +75,17 @@ export function WeatherWidget() {
   };
 
   return (
-    <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-500/30 rounded-full flex items-center justify-center">
-            <span className="text-lg">{getWeatherEmoji(weather.conditionIcon)}</span>
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-white">날씨</h2>
-            <p className="text-xs text-gray-400">{weather.location}</p>
-          </div>
-        </div>
-        <div className="text-xs text-gray-500">
+    <WidgetCard className="overflow-hidden">
+      <WidgetHeader
+        icon={getWeatherEmoji(weather.conditionIcon)}
+        title="날씨"
+        accent="weather"
+        subtitle={weather.location}
+      >
+        <span className="text-xs text-gray-500">
           {weather.updatedAt.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 업데이트
-        </div>
-      </div>
+        </span>
+      </WidgetHeader>
 
       {/* Content */}
       <div className="flex-1 flex items-center gap-8">
@@ -163,6 +155,6 @@ export function WeatherWidget() {
           </div>
         </div>
       </div>
-    </div>
+    </WidgetCard>
   );
 }

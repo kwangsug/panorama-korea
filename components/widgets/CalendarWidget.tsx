@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { WidgetCard } from '@/components/ui/WidgetCard';
+import { WidgetHeader } from '@/components/ui/WidgetHeader';
 
 interface CalendarEvent {
   id: string;
@@ -142,17 +144,12 @@ export function CalendarWidget({
 
   if (loading) {
     return (
-      <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 bg-purple-500/30 rounded-full flex items-center justify-center">
-            <span className="text-lg">📅</span>
-          </div>
-          <h2 className="text-lg font-semibold text-white">오늘의 일정</h2>
-        </div>
+      <WidgetCard>
+        <WidgetHeader icon="📅" title="오늘의 일정" accent="calendar" />
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-pulse text-gray-400">일정 로딩 중...</div>
         </div>
-      </div>
+      </WidgetCard>
     );
   }
 
@@ -161,14 +158,8 @@ export function CalendarWidget({
   const dayOfWeek = today.toLocaleDateString('ko-KR', { weekday: 'long' });
 
   return (
-    <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col">
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-8 h-8 bg-purple-500/30 rounded-full flex items-center justify-center">
-          <span className="text-lg">📅</span>
-        </div>
-        <h2 className="text-lg font-semibold text-white">오늘의 일정</h2>
-      </div>
+    <WidgetCard>
+      <WidgetHeader icon="📅" title="오늘의 일정" accent="calendar" />
 
       {/* Content - 2 Column Layout: Date Left, Events List Right */}
       <div className="flex-1 flex gap-6">
@@ -252,6 +243,6 @@ export function CalendarWidget({
           )}
         </div>
       </div>
-    </div>
+    </WidgetCard>
   );
 }

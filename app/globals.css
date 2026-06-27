@@ -3,11 +3,47 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /*
+   * 디자인 토큰 (Phase 3)
+   * 위젯별 액센트는 5뷰 순환에서 한눈에 구분되도록 5색 차별화.
+   * 기존: weather=blue, news=green, jobs=orange, calendar=purple, finance=green(중복!)
+   * 변경: finance=amber로 분리 — 페이지 인디케이터 충돌 해소
+   */
+  --accent-weather: #60a5fa;   /* blue-400 */
+  --accent-news:    #4ade80;   /* green-400 */
+  --accent-jobs:    #fb923c;   /* orange-400 */
+  --accent-calendar:#c084fc;   /* purple-400 */
+  --accent-finance: #fbbf24;   /* amber-400 — 금융 */
+  --accent-mock:    #fcd34d;   /* amber-300 — 샘플 배지 */
+
+  /* surface (glass-morphism 컨테이너) */
+  --surface-bg:     rgba(255, 255, 255, 0.10);
+  --surface-border: rgba(255, 255, 255, 0.10);
+  --surface-radius: 1rem;       /* rounded-2xl */
+  --surface-pad:    1.25rem;    /* p-5 */
+
+  /* 텍스트 톤 */
+  --text-primary:   #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.70);  /* gray-300 근사 */
+  --text-tertiary:  rgba(255, 255, 255, 0.50);  /* gray-400 근사 */
+
+  /* 전환 timing */
+  --ease-out-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:   0.15s;
+  --duration-normal: 0.3s;
+  --duration-slow:   0.5s;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent-weather: var(--accent-weather);
+  --color-accent-news: var(--accent-news);
+  --color-accent-jobs: var(--accent-jobs);
+  --color-accent-calendar: var(--accent-calendar);
+  --color-accent-finance: var(--accent-finance);
+  --color-accent-mock: var(--accent-mock);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { WidgetCard } from '@/components/ui/WidgetCard';
+import { WidgetHeader } from '@/components/ui/WidgetHeader';
 
 interface JobItem {
   title: string;
@@ -141,33 +143,23 @@ export function JobWidget({ rotationSeconds = 10 }: JobWidgetProps) {
 
   if (loading) {
     return (
-      <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-4 border border-white/10 flex flex-col">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-7 h-7 bg-orange-500/30 rounded-full flex items-center justify-center">
-            <span className="text-sm">💼</span>
-          </div>
-          <h2 className="text-base font-semibold text-white">채용정보</h2>
-        </div>
+      <WidgetCard>
+        <WidgetHeader icon="💼" title="채용정보" accent="jobs" />
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-pulse text-gray-400 text-sm">로딩 중...</div>
         </div>
-      </div>
+      </WidgetCard>
     );
   }
 
   if (jobs.length === 0) {
     return (
-      <div className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-4 border border-white/10 flex flex-col">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-7 h-7 bg-orange-500/30 rounded-full flex items-center justify-center">
-            <span className="text-sm">💼</span>
-          </div>
-          <h2 className="text-base font-semibold text-white">채용정보</h2>
-        </div>
+      <WidgetCard>
+        <WidgetHeader icon="💼" title="채용정보" accent="jobs" />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-gray-400 text-sm">채용정보를 불러올 수 없습니다</div>
         </div>
-      </div>
+      </WidgetCard>
     );
   }
 
@@ -216,25 +208,13 @@ export function JobWidget({ rotationSeconds = 10 }: JobWidgetProps) {
   };
 
   return (
-    <div
-      className="h-full bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-white/10 flex flex-col"
+    <WidgetCard
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerLeave={() => { setIsDragging(false); setSwipeAxis(null); }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-orange-500/30 rounded-full flex items-center justify-center">
-            <span className="text-lg">💼</span>
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-white">채용정보</h2>
-            <p className="text-xs text-gray-400">{feedTitle}</p>
-          </div>
-        </div>
-      </div>
+      <WidgetHeader icon="💼" title="채용정보" accent="jobs" subtitle={feedTitle} />
 
       {/* Job Content */}
       <div className="flex-1 flex flex-col">
@@ -298,6 +278,6 @@ export function JobWidget({ rotationSeconds = 10 }: JobWidgetProps) {
           />
         ))}
       </div>
-    </div>
+    </WidgetCard>
   );
 }
